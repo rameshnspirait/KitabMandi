@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       //  Theme Setup
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.dark,
       //  Routing
       initialRoute: AppRoutes.splash,
       initialBinding: InitialBinding(),

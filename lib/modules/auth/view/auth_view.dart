@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import 'package:kitab_mandi/core/constants/app_color.dart';
 import 'package:kitab_mandi/core/constants/app_string.dart';
 import 'package:kitab_mandi/core/utils/validators.dart';
 import 'package:kitab_mandi/modules/auth/controller/auth_controller.dart';
 import 'package:kitab_mandi/widgets/app_button.dart';
-import 'package:kitab_mandi/widgets/app_text.dart';
 import 'package:kitab_mandi/widgets/app_text_field.dart';
 
 class AuthView extends StatefulWidget {
@@ -58,32 +57,31 @@ class _AuthViewState extends State<AuthView> {
     }
   }
 
-  void forgotPassword() {
-    // if (emailController.text.isEmpty) {
-    //   Get.snackbar("Error", "Please enter your email first");
-    //   return;
-    // }
-
-    // controller.forgotPassword(emailController.text.trim());
-  }
+  void forgotPassword() {}
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final textColor = theme.textTheme.bodyLarge?.color;
+    final secondaryText = theme.textTheme.bodySmall?.color;
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+
       body: Column(
         children: [
-          /// 🔥 PREMIUM HEADER
+          /// 🔥 HEADER
           Container(
             width: double.infinity,
             padding: const EdgeInsets.only(top: 60, bottom: 40),
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color(0xFF0D47A1),
-                  Color(0xFF1976D2),
-                  Color(0xFFFF8F00),
+                  AppColors.primaryDark,
+                  AppColors.primary,
+                  AppColors.secondaryDark,
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -92,12 +90,9 @@ class _AuthViewState extends State<AuthView> {
             ),
             child: Column(
               children: [
-                /// 🖼 LOGO
                 Image.asset("assets/splash.png", height: 70),
-
                 const SizedBox(height: 12),
-
-                const Text(
+                Text(
                   "KitabMandi",
                   style: TextStyle(
                     fontSize: 26,
@@ -105,18 +100,19 @@ class _AuthViewState extends State<AuthView> {
                     color: Colors.white,
                   ),
                 ),
-
                 const SizedBox(height: 6),
-
-                const Text(
+                Text(
                   "Buy • Sell • Save • Learn",
-                  style: TextStyle(fontSize: 13, color: Colors.white70),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.white.withOpacity(0.8),
+                  ),
                 ),
               ],
             ),
           ),
 
-          /// 🔽 FORM SECTION
+          /// 🔽 FORM
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
@@ -128,11 +124,13 @@ class _AuthViewState extends State<AuthView> {
                     Container(
                       padding: const EdgeInsets.all(22),
                       decoration: BoxDecoration(
-                        color: theme.cardColor.withOpacity(0.95),
+                        color: theme.cardColor,
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
+                            color: isDark
+                                ? Colors.black.withOpacity(0.4)
+                                : Colors.black.withOpacity(0.08),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
                           ),
@@ -140,7 +138,7 @@ class _AuthViewState extends State<AuthView> {
                       ),
                       child: Column(
                         children: [
-                          /// 👤 NAME
+                          /// NAME
                           if (!isLogin) ...[
                             AppTextField(
                               controller: nameController,
@@ -151,7 +149,7 @@ class _AuthViewState extends State<AuthView> {
                             const SizedBox(height: 16),
                           ],
 
-                          /// 📧 EMAIL
+                          /// EMAIL
                           AppTextField(
                             controller: emailController,
                             hintText: AppStrings.email,
@@ -161,7 +159,7 @@ class _AuthViewState extends State<AuthView> {
 
                           const SizedBox(height: 16),
 
-                          /// 🔑 PASSWORD
+                          /// PASSWORD
                           AppTextField(
                             controller: passwordController,
                             hintText: AppStrings.password,
@@ -173,6 +171,7 @@ class _AuthViewState extends State<AuthView> {
                                 obscurePassword
                                     ? Icons.visibility_off_rounded
                                     : Icons.visibility_rounded,
+                                color: theme.iconTheme.color,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -182,19 +181,25 @@ class _AuthViewState extends State<AuthView> {
                             ),
                           ),
 
-                          /// 🔐 FORGOT PASSWORD
+                          /// FORGOT PASSWORD
                           if (isLogin)
                             Align(
                               alignment: Alignment.centerRight,
                               child: TextButton(
                                 onPressed: forgotPassword,
-                                child: const Text("Forgot Password?"),
+                                child: Text(
+                                  "Forgot Password?",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                ),
                               ),
                             ),
 
                           const SizedBox(height: 20),
 
-                          /// 🔘 LOGIN / SIGNUP BUTTON
+                          /// BUTTON
                           Obx(
                             () => AppButton(
                               text: isLogin
@@ -210,35 +215,38 @@ class _AuthViewState extends State<AuthView> {
 
                     const SizedBox(height: 25),
 
-                    /// 🔥 DIVIDER
+                    /// DIVIDER
                     Row(
                       children: [
-                        Expanded(child: Divider(color: Colors.grey.shade300)),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          child: Text("OR"),
+                        Expanded(child: Divider(color: theme.dividerColor)),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Text(
+                            "OR",
+                            style: TextStyle(color: secondaryText),
+                          ),
                         ),
-                        Expanded(child: Divider(color: Colors.grey.shade300)),
+                        Expanded(child: Divider(color: theme.dividerColor)),
                       ],
                     ),
 
                     const SizedBox(height: 20),
 
-                    /// 🔵 GOOGLE BUTTON WITH LOGO
+                    /// GOOGLE BUTTON
                     GestureDetector(
-                      onTap: () {
-                        // controller.signInWithGoogle();
-                      },
+                      onTap: () {},
                       child: Container(
                         width: double.infinity,
                         height: 52,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: isDark ? theme.cardColor : Colors.white,
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: Colors.grey.shade300),
+                          border: Border.all(color: theme.dividerColor),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: isDark
+                                  ? Colors.black.withOpacity(0.3)
+                                  : Colors.black.withOpacity(0.05),
                               blurRadius: 10,
                               offset: const Offset(0, 5),
                             ),
@@ -247,15 +255,12 @@ class _AuthViewState extends State<AuthView> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Image.asset(
-                              "assets/google.png", // 👈 your google logo
-                              height: 22,
-                            ),
+                            Image.asset("assets/google.png", height: 22),
                             const SizedBox(width: 12),
-                            const Text(
+                            Text(
                               "Continue with Google",
                               style: TextStyle(
-                                color: Colors.black87,
+                                color: textColor,
                                 fontWeight: FontWeight.w500,
                                 fontSize: 15,
                               ),
@@ -267,7 +272,7 @@ class _AuthViewState extends State<AuthView> {
 
                     const SizedBox(height: 25),
 
-                    /// 🔁 TOGGLE LOGIN/SIGNUP
+                    /// TOGGLE
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -275,13 +280,14 @@ class _AuthViewState extends State<AuthView> {
                           isLogin
                               ? "Don't have an account? "
                               : "Already have an account? ",
+                          style: TextStyle(color: secondaryText),
                         ),
                         GestureDetector(
                           onTap: toggleMode,
                           child: Text(
                             isLogin ? "Sign Up" : "Login",
-                            style: const TextStyle(
-                              color: Color(0xFF1976D2),
+                            style: TextStyle(
+                              color: theme.colorScheme.primary,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -291,10 +297,10 @@ class _AuthViewState extends State<AuthView> {
 
                     const SizedBox(height: 20),
 
-                    /// 📜 TERMS
-                    const Text(
+                    /// TERMS
+                    Text(
                       "By continuing, you agree to our Terms & Privacy Policy",
-                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                      style: TextStyle(fontSize: 12, color: secondaryText),
                       textAlign: TextAlign.center,
                     ),
 

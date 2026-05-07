@@ -5,16 +5,16 @@ class AppRoutes {
   static const auth = '/auth';
   static const signup = '/signup';
 
-  // 🏠 Main
+  //  Main
   static const home = '/home';
 
-  // 📚 Books
+  //  Books
   static const addBook = '/add-book';
   static const bookDetails = '/book-details';
 
-  // 💬 Chat
+  //  Chat
   static const chat = '/chat';
 
-  // 👤 Profile
+  //  Profile
   static const profile = '/profile';
 }

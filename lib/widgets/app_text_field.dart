@@ -29,6 +29,8 @@ class AppTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    final textColor = theme.textTheme.bodyLarge?.color;
+
     return TextFormField(
       controller: controller,
       obscureText: obscureText,
@@ -36,18 +38,21 @@ class AppTextField extends StatelessWidget {
       validator: validator,
       maxLines: maxLines,
       enabled: enabled,
-      style: AppTextStyles.body(),
+
+      cursorColor: theme.colorScheme.primary,
+
+      style: AppTextStyles.body().copyWith(color: textColor),
 
       decoration: InputDecoration(
+        isDense: true,
+
         hintText: hintText,
-        hintStyle: AppTextStyles.subtitle(),
+        hintStyle: AppTextStyles.subtitle().copyWith(color: theme.hintColor),
 
         prefixIcon: prefixIcon,
         suffixIcon: suffixIcon,
 
         filled: true,
-
-        // 🔥 THEME-BASED BACKGROUND (LIGHT + DARK)
         fillColor: theme.cardColor,
 
         contentPadding: const EdgeInsets.symmetric(
@@ -55,7 +60,6 @@ class AppTextField extends StatelessWidget {
           vertical: 14,
         ),
 
-        // 🔥 DEFAULT BORDER (thin, subtle)
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
@@ -64,7 +68,6 @@ class AppTextField extends StatelessWidget {
           ),
         ),
 
-        // 🔥 ENABLED BORDER
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
@@ -73,29 +76,27 @@ class AppTextField extends StatelessWidget {
           ),
         ),
 
-        // 🔥 FOCUSED BORDER
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.2),
         ),
 
-        // 🔥 ERROR BORDER
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: theme.colorScheme.error, width: 1),
         ),
 
-        // 🔥 FOCUSED ERROR BORDER
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: theme.colorScheme.error, width: 1.2),
         ),
 
-        // 🔥 ERROR TEXT STYLE
         errorStyle: AppTextStyles.caption().copyWith(
           color: theme.colorScheme.error,
         ),
       ),
+
+      spellCheckConfiguration: const SpellCheckConfiguration.disabled(),
     );
   }
 }
