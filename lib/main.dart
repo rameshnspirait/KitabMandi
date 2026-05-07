@@ -20,14 +20,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'KitabMandi',
-      //  Remove debug banner
       debugShowCheckedModeBanner: false,
       //  Theme Setup
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.dark,
+      themeMode: ThemeMode.light,
       //  Routing
-      initialRoute: AppRoutes.wrapper,
+      initialRoute: AppRoutes.splash,
       initialBinding: InitialBinding(),
       getPages: AppPages.routes,
       //  Default Transition (optional but premium feel)

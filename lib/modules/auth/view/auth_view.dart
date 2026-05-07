@@ -58,6 +58,15 @@ class _AuthViewState extends State<AuthView> {
     }
   }
 
+  void forgotPassword() {
+    // if (emailController.text.isEmpty) {
+    //   Get.snackbar("Error", "Please enter your email first");
+    //   return;
+    // }
+
+    // controller.forgotPassword(emailController.text.trim());
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -65,42 +74,49 @@ class _AuthViewState extends State<AuthView> {
     return Scaffold(
       body: Column(
         children: [
-          // 🔥 TOP HEADER (THEME BASED)
+          /// 🔥 PREMIUM HEADER
           Container(
             width: double.infinity,
             padding: const EdgeInsets.only(top: 60, bottom: 40),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary,
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(30),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFF0D47A1),
+                  Color(0xFF1976D2),
+                  Color(0xFFFF8F00),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
             ),
             child: Column(
               children: [
-                Icon(
-                  Icons.menu_book,
-                  size: 50,
-                  color: theme.colorScheme.onPrimary,
-                ),
-                const SizedBox(height: 10),
-                AppText(
+                /// 🖼 LOGO
+                Image.asset("assets/splash.png", height: 70),
+
+                const SizedBox(height: 12),
+
+                const Text(
                   "KitabMandi",
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    color: theme.colorScheme.onPrimary,
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
+
                 const SizedBox(height: 6),
-                AppText(
-                  "Buy & Sell Used Books",
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onPrimary.withOpacity(0.7),
-                  ),
+
+                const Text(
+                  "Buy • Sell • Save • Learn",
+                  style: TextStyle(fontSize: 13, color: Colors.white70),
                 ),
               ],
             ),
           ),
 
-          // 🔽 FORM SECTION
+          /// 🔽 FORM SECTION
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
@@ -108,25 +124,23 @@ class _AuthViewState extends State<AuthView> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    // 🔥 CARD CONTAINER
+                    /// 💎 CARD
                     Container(
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(22),
                       decoration: BoxDecoration(
-                        color: theme.cardColor,
-                        borderRadius: BorderRadius.circular(16),
+                        color: theme.cardColor.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: theme.brightness == Brightness.dark
-                                ? Colors.black.withOpacity(0.4)
-                                : Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
                           ),
                         ],
                       ),
                       child: Column(
                         children: [
-                          // 👤 NAME
+                          /// 👤 NAME
                           if (!isLogin) ...[
                             AppTextField(
                               controller: nameController,
@@ -137,7 +151,7 @@ class _AuthViewState extends State<AuthView> {
                             const SizedBox(height: 16),
                           ],
 
-                          // 📧 EMAIL
+                          /// 📧 EMAIL
                           AppTextField(
                             controller: emailController,
                             hintText: AppStrings.email,
@@ -147,7 +161,7 @@ class _AuthViewState extends State<AuthView> {
 
                           const SizedBox(height: 16),
 
-                          // 🔑 PASSWORD
+                          /// 🔑 PASSWORD
                           AppTextField(
                             controller: passwordController,
                             hintText: AppStrings.password,
@@ -157,8 +171,8 @@ class _AuthViewState extends State<AuthView> {
                             suffixIcon: IconButton(
                               icon: Icon(
                                 obscurePassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
+                                    ? Icons.visibility_off_rounded
+                                    : Icons.visibility_rounded,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -168,9 +182,19 @@ class _AuthViewState extends State<AuthView> {
                             ),
                           ),
 
+                          /// 🔐 FORGOT PASSWORD
+                          if (isLogin)
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: forgotPassword,
+                                child: const Text("Forgot Password?"),
+                              ),
+                            ),
+
                           const SizedBox(height: 20),
 
-                          // 🔘 SUBMIT BUTTON
+                          /// 🔘 LOGIN / SIGNUP BUTTON
                           Obx(
                             () => AppButton(
                               text: isLogin
@@ -184,53 +208,94 @@ class _AuthViewState extends State<AuthView> {
                       ),
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 25),
 
-                    // 🔥 DIVIDER
+                    /// 🔥 DIVIDER
                     Row(
                       children: [
-                        const Expanded(child: Divider()),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: AppText("OR"),
+                        Expanded(child: Divider(color: Colors.grey.shade300)),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10),
+                          child: Text("OR"),
                         ),
-                        const Expanded(child: Divider()),
+                        Expanded(child: Divider(color: Colors.grey.shade300)),
                       ],
                     ),
 
                     const SizedBox(height: 20),
 
-                    // 🔥 GOOGLE BUTTON
-                    AppButton(
-                      text: "Continue with Google",
-                      color: theme.cardColor,
-                      onPressed: () {
+                    /// 🔵 GOOGLE BUTTON WITH LOGO
+                    GestureDetector(
+                      onTap: () {
                         // controller.signInWithGoogle();
                       },
+                      child: Container(
+                        width: double.infinity,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: Colors.grey.shade300),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              "assets/google.png", // 👈 your google logo
+                              height: 22,
+                            ),
+                            const SizedBox(width: 12),
+                            const Text(
+                              "Continue with Google",
+                              style: TextStyle(
+                                color: Colors.black87,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 25),
 
-                    // 🔁 TOGGLE
+                    /// 🔁 TOGGLE LOGIN/SIGNUP
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        AppText(
+                        Text(
                           isLogin
                               ? "Don't have an account? "
                               : "Already have an account? ",
                         ),
                         GestureDetector(
                           onTap: toggleMode,
-                          child: AppText(
-                            isLogin ? AppStrings.signup : AppStrings.login,
-                            style: TextStyle(
-                              color: theme.colorScheme.primary,
-                              fontWeight: FontWeight.w600,
+                          child: Text(
+                            isLogin ? "Sign Up" : "Login",
+                            style: const TextStyle(
+                              color: Color(0xFF1976D2),
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
                       ],
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    /// 📜 TERMS
+                    const Text(
+                      "By continuing, you agree to our Terms & Privacy Policy",
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                      textAlign: TextAlign.center,
                     ),
 
                     const SizedBox(height: 30),

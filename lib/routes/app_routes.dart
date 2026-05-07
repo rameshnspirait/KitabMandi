@@ -1,6 +1,7 @@
 class AppRoutes {
   // 🔐 Auth
-  static const wrapper = '/';
+  static const splash = '/';
+  static const wrapper = '/wrapper';
   static const auth = '/auth';
   static const signup = '/signup';
 

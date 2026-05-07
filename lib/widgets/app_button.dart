@@ -7,6 +7,7 @@ class AppButton extends StatelessWidget {
   final VoidCallback onPressed;
   final bool isLoading;
   final Color? color;
+  final Color? textColor; //  NEW
 
   const AppButton({
     super.key,
@@ -14,24 +15,46 @@ class AppButton extends StatelessWidget {
     required this.onPressed,
     this.isLoading = false,
     this.color,
+    this.textColor, //  NEW
   });
 
   @override
   Widget build(BuildContext context) {
+    final bgColor = color ?? AppColors.primary;
+
+    /// Auto text color if not provided
+    final txtColor =
+        textColor ??
+        (bgColor.computeLuminance() > 0.5 ? Colors.black : Colors.white);
+
     return SizedBox(
       width: double.infinity,
-      height: 50,
+      height: 52, // slightly bigger for premium feel
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: color ?? AppColors.primary,
+          backgroundColor: bgColor,
+          elevation: 2,
+          shadowColor: Colors.black.withOpacity(0.15),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
           ),
         ),
         child: isLoading
-            ? const CircularProgressIndicator(color: AppColors.white)
-            : Text(text, style: AppTextStyles.button),
+            ? SizedBox(
+                height: 22,
+                width: 22,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  color: txtColor,
+                ),
+              )
+            : Text(
+                text,
+                style: AppTextStyles.button.copyWith(
+                  color: txtColor, // ✅ applied here
+                ),
+              ),
       ),
     );
   }
