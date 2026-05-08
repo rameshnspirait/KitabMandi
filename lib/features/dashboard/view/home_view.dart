@@ -6,7 +6,7 @@ import 'package:kitab_mandi/features/dashboard/widget/home_location_appbar_widge
 import 'package:kitab_mandi/features/dashboard/widget/home_searchbar_widget.dart';
 
 class HomeView extends StatefulWidget {
-  HomeView({super.key});
+  const HomeView({super.key});
 
   @override
   State<HomeView> createState() => _HomeViewState();
@@ -26,7 +26,11 @@ class _HomeViewState extends State<HomeView> {
       body: Column(
         children: [
           const SizedBox(height: 10),
-          const SearchBarWidget(),
+          SearchBarWidget(
+            controller: TextEditingController(),
+            onChanged: (value) {},
+            onFilterTap: () {},
+          ),
           const SizedBox(height: 10),
 
           Expanded(
