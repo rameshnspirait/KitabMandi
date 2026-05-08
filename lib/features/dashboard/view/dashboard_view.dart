@@ -15,7 +15,7 @@ class DashboardView extends StatefulWidget {
 class _DashboardViewState extends State<DashboardView> {
   int currentIndex = 0;
 
-  final pages = const [HomeView(), SearchView(), CartView(), ProfileView()];
+  final pages = [HomeView(), SearchView(), CartView(), ProfileView()];
 
   void onTabChange(int index) {
     setState(() {

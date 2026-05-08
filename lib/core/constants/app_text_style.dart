@@ -3,6 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:kitab_mandi/core/constants/app_color.dart';
 
 class AppTextStyles {
+  static TextStyle heading() {
+    return const TextStyle(fontSize: 18, fontWeight: FontWeight.w600);
+  }
+
   static TextStyle heading1({bool isDark = false}) => GoogleFonts.poppins(
     fontSize: 24,
     fontWeight: FontWeight.bold,

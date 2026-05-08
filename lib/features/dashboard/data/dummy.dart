@@ -1,0 +1,58 @@
+import 'package:kitab_mandi/features/dashboard/model/book_model.dart';
+
+final List<BookModel> dummyBooks = [
+  BookModel(
+    id: "1",
+    title: "SSC CGL Complete Notes (Latest Edition)",
+    price: "₹250",
+    location: "Vijayawada",
+    sellerName: "Ramesh",
+    imageUrl: "https://picsum.photos/200/300?1",
+    postedTime: "2 days ago",
+  ),
+  BookModel(
+    id: "2",
+    title: "UPSC GS Foundation Books Set",
+    price: "₹1200",
+    location: "Hyderabad",
+    sellerName: "Ankit",
+    imageUrl: "https://picsum.photos/200/300?2",
+    postedTime: "1 day ago",
+  ),
+  BookModel(
+    id: "3",
+    title: "Engineering Mathematics Handwritten Notes",
+    price: "₹180",
+    location: "Bangalore",
+    sellerName: "Priya",
+    imageUrl: "https://picsum.photos/200/300?3",
+    postedTime: "5 hours ago",
+  ),
+  BookModel(
+    id: "4",
+    title: "Class 12 NCERT Physics Book",
+    price: "₹90",
+    location: "Delhi",
+    sellerName: "Rahul",
+    imageUrl: "https://picsum.photos/200/300?4",
+    postedTime: "3 days ago",
+  ),
+  BookModel(
+    id: "5",
+    title: "Banking Exam Preparation Notes",
+    price: "₹300",
+    location: "Lucknow",
+    sellerName: "Sneha",
+    imageUrl: "https://picsum.photos/200/300?5",
+    postedTime: "6 hours ago",
+  ),
+  BookModel(
+    id: "6",
+    title: "NEET Biology Complete Guide",
+    price: "₹450",
+    location: "Chennai",
+    sellerName: "Kiran",
+    imageUrl: "https://picsum.photos/200/300?6",
+    postedTime: "Yesterday",
+  ),
+];
