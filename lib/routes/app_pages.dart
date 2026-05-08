@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:kitab_mandi/features/auth/binding/auth_binding.dart';
 import 'package:kitab_mandi/features/auth/view/auth_view.dart';
+import 'package:kitab_mandi/features/dashboard/binding/dashboard_binding.dart';
+import 'package:kitab_mandi/features/dashboard/view/dashboard_view.dart';
 import 'package:kitab_mandi/features/splash/binding/splash_binding.dart';
 import 'package:kitab_mandi/features/splash/view/splash_view.dart';
 import 'package:kitab_mandi/features/wrapper/wrapper_view.dart';
@@ -20,6 +22,12 @@ class AppPages {
       name: AppRoutes.auth,
       page: () => const AuthView(),
       binding: AuthBinding(),
+    ),
+    // //  Dashboard
+    GetPage(
+      name: AppRoutes.dashboard,
+      page: () => const DashboardView(),
+      binding: DashboardBinding(),
     ),
   ];
 }

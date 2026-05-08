@@ -54,7 +54,7 @@ class AuthController extends GetxController {
       });
 
       AppSnackbar.success("Account created successfully");
-      Get.offAllNamed(AppRoutes.home);
+      Get.offAllNamed(AppRoutes.dashboard);
     } on FirebaseAuthException catch (e) {
       AppSnackbar.error(_handleAuthError(e));
     } catch (e) {
@@ -84,7 +84,7 @@ class AuthController extends GetxController {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
 
       AppSnackbar.success("Login successful");
-      Get.offAllNamed('/home');
+      Get.offAllNamed(AppRoutes.dashboard);
     } on FirebaseAuthException catch (e) {
       AppSnackbar.error(_handleAuthError(e));
     } catch (e) {
@@ -102,7 +102,7 @@ class AuthController extends GetxController {
       //  Force logout (optional but good for clean login)
       await _googleSignIn.signOut();
 
-      // 1️⃣ Trigger Google Sign-In
+      //  Trigger Google Sign-In
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
       if (googleUser == null) {
@@ -160,7 +160,7 @@ class AuthController extends GetxController {
       }
 
       AppSnackbar.success("Google login successful");
-      // Get.offAllNamed('/home');
+      Get.offAllNamed(AppRoutes.dashboard);
     } on FirebaseAuthException catch (e) {
       AppSnackbar.error(e.message ?? "Auth failed");
     } catch (e) {
