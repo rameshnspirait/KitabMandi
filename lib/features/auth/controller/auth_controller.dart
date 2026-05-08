@@ -2,7 +2,6 @@ import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
 import '../../../core/utils/app_snackbar.dart';
 import '../../../core/utils/validators.dart';
 
@@ -64,7 +63,7 @@ class AuthController extends GetxController {
     }
   }
 
-  // 🔐 LOGIN
+  //  LOGIN
   Future<void> login(String email, String password) async {
     final emailError = Validators.validateEmail(email);
     final passError = Validators.validatePassword(password);
