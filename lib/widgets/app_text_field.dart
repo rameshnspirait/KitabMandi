@@ -46,13 +46,15 @@ class AppTextField extends StatelessWidget {
       maxLines: maxLines,
       enabled: enabled,
       cursorColor: theme.colorScheme.primary,
-      style: AppTextStyles.body().copyWith(color: textColor),
+      style: AppTextStyles.body(context).copyWith(color: textColor),
 
       decoration: InputDecoration(
         isDense: true,
 
         hintText: hintText,
-        hintStyle: AppTextStyles.subtitle().copyWith(color: theme.hintColor),
+        hintStyle: AppTextStyles.subtitle(
+          context,
+        ).copyWith(color: theme.hintColor),
 
         /// ICONS
         prefixIcon: prefixIcon,
@@ -119,9 +121,9 @@ class AppTextField extends StatelessWidget {
                 ),
               ),
 
-        errorStyle: AppTextStyles.caption().copyWith(
-          color: theme.colorScheme.error,
-        ),
+        errorStyle: AppTextStyles.caption(
+          context,
+        ).copyWith(color: theme.colorScheme.error),
       ),
 
       spellCheckConfiguration: const SpellCheckConfiguration.disabled(),

@@ -1,12 +1,11 @@
 import 'package:get/get.dart';
+import 'package:kitab_mandi/core/controller/theme_controller.dart';
 import 'package:kitab_mandi/features/auth/controller/auth_controller.dart';
 
 class InitialBinding extends Bindings {
   @override
   void dependencies() {
-    Get.put<AuthController>(
-      AuthController(),
-      permanent: true, // 🔥 important
-    );
+    Get.put<AuthController>(AuthController(), permanent: true);
+    Get.put<ThemeController>(ThemeController(), permanent: true);
   }
 }

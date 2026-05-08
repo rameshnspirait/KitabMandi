@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kitab_mandi/core/constants/app_color.dart';
 import 'package:kitab_mandi/features/dashboard/model/book_model.dart';
 import 'package:kitab_mandi/widgets/app_cached_image_network.dart';
 
@@ -8,22 +7,47 @@ class ListingGridCard extends StatelessWidget {
 
   const ListingGridCard({super.key, required this.book});
 
+  Color _surface(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return isDark ? const Color(0xFF1A1D23) : const Color(0xFFFFFFFF);
+  }
+
+  Color _borderColor(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return isDark ? Colors.transparent : const Color(0xFFE5E7EB);
+  }
+
+  Color _mutedText(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return isDark ? const Color(0xFFB0B3B8) : const Color(0xFF6B7280);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
     return Container(
       decoration: BoxDecoration(
-        color: theme.cardColor,
+        color: _surface(context),
         borderRadius: BorderRadius.circular(16),
+
+        /// ✨ PREMIUM LIGHT SHADOW
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8),
+          BoxShadow(
+            color: Colors.black.withOpacity(
+              theme.brightness == Brightness.dark ? 0.25 : 0.06,
+            ),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
         ],
+
+        border: Border.all(color: _borderColor(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// IMAGE
+          /// 📸 IMAGE SECTION
           Stack(
             children: [
               ClipRRect(
@@ -40,71 +64,116 @@ class ListingGridCard extends StatelessWidget {
                 ),
               ),
 
+              /// ❤️ FAVORITE ICON (IMPROVED VISIBILITY)
               Positioned(
                 top: 8,
                 right: 8,
-                child: const Icon(Icons.favorite_border, color: Colors.white),
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.35),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Icon(
+                    Icons.favorite_border,
+                    size: 18,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ],
           ),
 
-          /// DETAILS
+          /// 📄 DETAILS
           Padding(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                /// 💰 PRICE (more premium hierarchy)
                 Text(
                   book.price,
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                     fontSize: 16,
                     color: theme.colorScheme.primary,
                   ),
                 ),
 
-                const SizedBox(height: 4),
-
-                Text(book.title, maxLines: 2, overflow: TextOverflow.ellipsis),
-
                 const SizedBox(height: 6),
 
+                /// 📘 TITLE
+                Text(
+                  book.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: theme.textTheme.bodyLarge?.color,
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                /// 👤 SELLER
                 Row(
                   children: [
-                    const CircleAvatar(
+                    CircleAvatar(
                       radius: 10,
+                      backgroundColor: theme.colorScheme.primary.withOpacity(
+                        0.15,
+                      ),
                       child: Icon(
                         Icons.person,
-                        size: 10,
-                        color: AppColors.white,
+                        size: 12,
+                        color: theme.colorScheme.primary,
                       ),
                     ),
                     const SizedBox(width: 6),
+
                     Expanded(
                       child: Text(
                         "Published by ${book.sellerName}",
-                        style: TextStyle(fontSize: 11, color: theme.hintColor),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: _mutedText(context),
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
 
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
 
+                /// 📍 LOCATION + TIME
                 Row(
                   children: [
-                    Icon(Icons.location_on, size: 12, color: theme.hintColor),
-                    const SizedBox(width: 3),
+                    Icon(
+                      Icons.location_on,
+                      size: 13,
+                      color: _mutedText(context),
+                    ),
+                    const SizedBox(width: 4),
+
                     Expanded(
                       child: Text(
                         book.location,
-                        style: TextStyle(fontSize: 11, color: theme.hintColor),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: _mutedText(context),
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+
                     Text(
-                      " • ${book.postedTime}",
-                      style: TextStyle(fontSize: 11, color: theme.hintColor),
+                      "• ${book.postedTime}",
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: _mutedText(context),
+                      ),
                     ),
                   ],
                 ),

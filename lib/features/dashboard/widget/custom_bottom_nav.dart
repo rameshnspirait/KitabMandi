@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kitab_mandi/core/constants/app_color.dart';
 
 class CustomBottomNav extends StatefulWidget {
   final int currentIndex;
@@ -41,6 +42,16 @@ class _CustomBottomNavState extends State<CustomBottomNav>
     widget.onCenterTap();
   }
 
+  Color _navBackground(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return isDark ? const Color(0xFF1A1D23) : const Color(0xFFFFFFFF);
+  }
+
+  Color _borderColor(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return isDark ? Colors.transparent : const Color(0xFFE5E7EB);
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -52,25 +63,33 @@ class _CustomBottomNavState extends State<CustomBottomNav>
     final theme = Theme.of(context);
 
     return SizedBox(
-      height: 100,
+      height: 95,
       child: Stack(
         alignment: Alignment.bottomCenter,
         clipBehavior: Clip.none,
         children: [
-          ///  NOTCHED NAV BAR
+          /// 🧭 NAV BAR CONTAINER
           ClipPath(
             clipper: _NavBarClipper(),
             child: Container(
               height: 75,
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
-                color: theme.cardColor,
+                color: _navBackground(context),
+
+                /// ✨ PREMIUM SHADOW SYSTEM
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
-                    blurRadius: 20,
+                    color: Colors.black.withOpacity(
+                      theme.brightness == Brightness.dark ? 0.35 : 0.08,
+                    ),
+                    blurRadius: 25,
+                    offset: const Offset(0, 10),
                   ),
                 ],
+
+                /// 🧱 SUBTLE BORDER (LIGHT MODE ONLY)
+                border: Border.all(color: _borderColor(context)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -87,49 +106,36 @@ class _CustomBottomNavState extends State<CustomBottomNav>
             ),
           ),
 
-          /// 🔥 FLOATING SELL BUTTON (ANIMATED)
+          /// 🔥 FLOATING SELL BUTTON
           Positioned(
             top: 0,
             child: GestureDetector(
               onTap: _onTapSell,
               child: ScaleTransition(
                 scale: _scaleAnim,
-                child: Column(
-                  children: [
-                    Container(
-                      height: 60,
-                      width: 60,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: [
-                            theme.colorScheme.primary,
-                            theme.colorScheme.primary.withOpacity(0.7),
-                          ],
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: theme.colorScheme.primary.withOpacity(0.5),
-                            blurRadius: 20,
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.add,
-                        color: Colors.white,
-                        size: 30,
-                      ),
+                child: Container(
+                  height: 62,
+                  width: 62,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+
+                    /// ✨ PREMIUM GRADIENT (SOFT, NOT HARSH)
+                    gradient: LinearGradient(
+                      colors: theme.brightness == Brightness.dark
+                          ? [AppColors.secondaryDark, AppColors.secondary]
+                          : [AppColors.primaryDark, AppColors.primary],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "Sell",
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: theme.textTheme.bodyMedium?.color,
+
+                    /// 🌟 SHADOW DEPTH
+                    boxShadow: [
+                      BoxShadow(
+                        color: theme.colorScheme.primary.withOpacity(0.35),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                  child: const Icon(Icons.add, color: Colors.white, size: 30),
                 ),
               ),
             ),
@@ -139,7 +145,7 @@ class _CustomBottomNavState extends State<CustomBottomNav>
     );
   }
 
-  /// 🔹 NAV ITEM
+  /// 🔹 NAV ITEM (IMPROVED PREMIUM STATE)
   Widget _navItem(
     IconData icon,
     String label,
@@ -151,35 +157,47 @@ class _CustomBottomNavState extends State<CustomBottomNav>
 
     return GestureDetector(
       onTap: () => widget.onTap(index),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AnimatedScale(
-            scale: isSelected ? 1.2 : 1.0,
-            duration: const Duration(milliseconds: 250),
-            child: Icon(
-              icon,
-              color: isSelected
-                  ? theme.colorScheme.primary
-                  : theme.iconTheme.color,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? theme.colorScheme.primary.withOpacity(0.08)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedScale(
+              scale: isSelected ? 1.2 : 1.0,
+              duration: const Duration(milliseconds: 200),
+              child: Icon(
+                icon,
+                color: isSelected
+                    ? theme.colorScheme.primary
+                    : theme.iconTheme.color?.withOpacity(0.7),
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-              color: isSelected ? theme.colorScheme.primary : theme.hintColor,
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                color: isSelected
+                    ? theme.colorScheme.primary
+                    : theme.textTheme.bodySmall?.color?.withOpacity(0.6),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-/// ✂️ CUSTOM CLIPPER FOR NOTCH
+/// ✂️ NOTCH CLIPPER (UNCHANGED BUT CLEAN)
 class _NavBarClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {

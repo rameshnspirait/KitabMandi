@@ -18,6 +18,13 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final width = MediaQuery.of(context).size.width;
+
+    final aspectRatio = width < 360
+        ? 0.55
+        : width < 420
+        ? 0.60
+        : 0.65;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -36,10 +43,7 @@ class _HomeViewState extends State<HomeView> {
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {
-                isLoading = true;
                 await Future.delayed(Duration(seconds: 2));
-                isLoading = false;
-                setState(() {});
               },
               child: isLoading
                   ? GridView.builder(
@@ -56,13 +60,12 @@ class _HomeViewState extends State<HomeView> {
                   : GridView.builder(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       itemCount: dummyBooks.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 12,
-                            crossAxisSpacing: 12,
-                            childAspectRatio: 0.68,
-                          ),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 12,
+                        crossAxisSpacing: 12,
+                        childAspectRatio: aspectRatio,
+                      ),
                       itemBuilder: (context, index) {
                         final book = dummyBooks[index];
 

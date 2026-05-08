@@ -23,7 +23,7 @@ class AppDropdown<T> extends StatelessWidget {
         hintText: hint,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      style: AppTextStyles.body(),
+      style: AppTextStyles.body(context),
       items: items.map((item) {
         return DropdownMenuItem(value: item, child: Text(item.toString()));
       }).toList(),

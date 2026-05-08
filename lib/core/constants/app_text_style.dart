@@ -1,42 +1,79 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kitab_mandi/core/constants/app_color.dart';
 
 class AppTextStyles {
-  static TextStyle heading() {
-    return const TextStyle(fontSize: 18, fontWeight: FontWeight.w600);
+  static TextStyle heading1(BuildContext context) {
+    final theme = Theme.of(context);
+    return GoogleFonts.poppins(
+      fontSize: 24,
+      fontWeight: FontWeight.bold,
+      color: theme.textTheme.titleLarge?.color,
+    );
   }
 
-  static TextStyle heading1({bool isDark = false}) => GoogleFonts.poppins(
-    fontSize: 24,
-    fontWeight: FontWeight.bold,
-    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
-  );
+  static TextStyle heading2(BuildContext context) {
+    final theme = Theme.of(context);
+    return GoogleFonts.poppins(
+      fontSize: 20,
+      fontWeight: FontWeight.w600,
+      color: theme.textTheme.titleMedium?.color,
+    );
+  }
 
-  static TextStyle heading2({bool isDark = false}) => GoogleFonts.poppins(
-    fontSize: 20,
-    fontWeight: FontWeight.w600,
-    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
-  );
+  static TextStyle title(BuildContext context) {
+    final theme = Theme.of(context);
+    return GoogleFonts.poppins(
+      fontSize: 18,
+      fontWeight: FontWeight.w600,
+      color: theme.textTheme.bodyLarge?.color,
+    );
+  }
 
-  static TextStyle body({bool isDark = false}) => GoogleFonts.poppins(
-    fontSize: 16,
-    color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
-  );
+  static TextStyle body(BuildContext context) {
+    final theme = Theme.of(context);
+    return GoogleFonts.poppins(
+      fontSize: 16,
+      color: theme.textTheme.bodyMedium?.color,
+    );
+  }
 
-  static TextStyle subtitle({bool isDark = false}) => GoogleFonts.poppins(
-    fontSize: 14,
-    color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
-  );
+  static TextStyle subtitle(BuildContext context) {
+    final theme = Theme.of(context);
+    return GoogleFonts.poppins(
+      fontSize: 14,
+      color: theme.textTheme.bodySmall?.color,
+    );
+  }
 
-  static TextStyle caption({bool isDark = false}) => GoogleFonts.poppins(
-    fontSize: 12,
-    color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
-  );
+  static TextStyle caption(BuildContext context) {
+    final theme = Theme.of(context);
+    return GoogleFonts.poppins(fontSize: 12, color: theme.hintColor);
+  }
 
-  static TextStyle button = GoogleFonts.poppins(
-    fontSize: 16,
-    fontWeight: FontWeight.w600,
-    color: Colors.white,
-  );
+  static TextStyle button(BuildContext context) {
+    return GoogleFonts.poppins(
+      fontSize: 16,
+      fontWeight: FontWeight.w600,
+      color: Colors.white,
+    );
+  }
+
+  /// Marketplace extras
+  static TextStyle price(BuildContext context) {
+    final theme = Theme.of(context);
+    return GoogleFonts.poppins(
+      fontSize: 18,
+      fontWeight: FontWeight.bold,
+      color: theme.colorScheme.primary,
+    );
+  }
+
+  static TextStyle tag(BuildContext context) {
+    final theme = Theme.of(context);
+    return GoogleFonts.poppins(
+      fontSize: 12,
+      fontWeight: FontWeight.w500,
+      color: theme.colorScheme.primary,
+    );
+  }
 }

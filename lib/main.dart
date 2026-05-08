@@ -6,10 +6,12 @@ import 'package:kitab_mandi/core/themes/app_theme.dart';
 import 'package:kitab_mandi/firebase_options.dart';
 import 'package:kitab_mandi/routes/app_routes.dart';
 import 'routes/app_pages.dart';
+import 'core/controller/theme_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(const MyApp());
 }
 
@@ -18,21 +20,32 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      title: 'KitabMandi',
-      debugShowCheckedModeBanner: false,
-      //  Theme Setup
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.dark,
-      //  Routing
-      initialRoute: AppRoutes.splash,
-      initialBinding: InitialBinding(),
-      getPages: AppPages.routes,
-      //  Default Transition (optional but premium feel)
-      defaultTransition: Transition.cupertino,
-      //  Smart back gesture handling
-      popGesture: true,
+    final ThemeController controller = Get.put(
+      ThemeController(),
+      permanent: true,
     );
+
+    return Obx(() {
+      return GetMaterialApp(
+        title: 'KitabMandi',
+        debugShowCheckedModeBanner: false,
+
+        // 🌗 THEMES
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+
+        // ✅ DYNAMIC THEME (FIXED)
+        themeMode: controller.themeMode.value,
+
+        // 🚀 ROUTING
+        initialRoute: AppRoutes.splash,
+        initialBinding: InitialBinding(),
+        getPages: AppPages.routes,
+
+        // ✨ UI POLISH
+        defaultTransition: Transition.cupertino,
+        popGesture: true,
+      );
+    });
   }
 }
