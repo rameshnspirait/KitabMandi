@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:kitab_mandi/modules/auth/view/auth_view.dart';
-import 'package:kitab_mandi/modules/home/home_view.dart';
+import 'package:kitab_mandi/features/auth/view/auth_view.dart';
+import 'package:kitab_mandi/features/home/home_view.dart';
 
 class WrapperView extends StatelessWidget {
   const WrapperView({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kitab_mandi/core/constants/app_color.dart';
-import 'package:kitab_mandi/modules/splash/controller/splash_controller.dart';
+import 'package:kitab_mandi/features/splash/controller/splash_controller.dart';
 
 class SplashView extends StatelessWidget {
   SplashView({super.key});

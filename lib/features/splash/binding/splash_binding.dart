@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:kitab_mandi/modules/splash/controller/splash_controller.dart';
+import 'package:kitab_mandi/features/splash/controller/splash_controller.dart';
 
 class SplashBinding extends Bindings {
   @override

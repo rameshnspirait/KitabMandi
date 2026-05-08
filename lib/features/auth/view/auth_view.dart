@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:kitab_mandi/core/constants/app_color.dart';
 import 'package:kitab_mandi/core/constants/app_string.dart';
 import 'package:kitab_mandi/core/utils/validators.dart';
-import 'package:kitab_mandi/modules/auth/controller/auth_controller.dart';
+import 'package:kitab_mandi/features/auth/controller/auth_controller.dart';
 import 'package:kitab_mandi/widgets/app_button.dart';
 import 'package:kitab_mandi/widgets/app_text_field.dart';
 
@@ -234,7 +234,9 @@ class _AuthViewState extends State<AuthView> {
 
                     /// GOOGLE BUTTON
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () async {
+                        await controller.signInWithGoogle();
+                      },
                       child: Container(
                         width: double.infinity,
                         height: 52,
