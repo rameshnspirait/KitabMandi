@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:kitab_mandi/routes/app_routes.dart';
 import '../../../core/utils/app_snackbar.dart';
 import '../../../core/utils/validators.dart';
 
@@ -15,7 +16,7 @@ class AuthController extends GetxController {
 
   var isLoading = false.obs;
 
-  // 🔐 SIGNUP
+  //  SIGNUP
   Future<void> signUp(String name, String email, String password) async {
     // Validation
     final nameError = Validators.validateName(name);
@@ -53,7 +54,7 @@ class AuthController extends GetxController {
       });
 
       AppSnackbar.success("Account created successfully");
-      Get.offAllNamed('/home');
+      Get.offAllNamed(AppRoutes.home);
     } on FirebaseAuthException catch (e) {
       AppSnackbar.error(_handleAuthError(e));
     } catch (e) {
@@ -98,18 +99,19 @@ class AuthController extends GetxController {
     try {
       isLoading.value = true;
 
-      // 🔥 Force logout (optional but good for clean login)
+      //  Force logout (optional but good for clean login)
       await _googleSignIn.signOut();
 
       // 1️⃣ Trigger Google Sign-In
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
       if (googleUser == null) {
-        Get.snackbar("Cancelled", "Google sign-in cancelled");
+        AppSnackbar.error("Google sign-in cancelled");
+
         return;
       }
 
-      // 2️⃣ Get authentication tokens
+      //  Get authentication tokens
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
 
@@ -117,17 +119,17 @@ class AuthController extends GetxController {
       final accessToken = googleAuth.accessToken;
 
       if (idToken == null) {
-        Get.snackbar("Error", "ID Token is null");
+        AppSnackbar.error("ID Token is null");
         return;
       }
 
-      // 3️⃣ Create Firebase credential
+      //  Create Firebase credential
       final credential = GoogleAuthProvider.credential(
         idToken: idToken,
         accessToken: accessToken,
       );
 
-      // 4️⃣ Firebase sign-in
+      //  Firebase sign-in
       final userCred = await FirebaseAuth.instance.signInWithCredential(
         credential,
       );
@@ -135,11 +137,11 @@ class AuthController extends GetxController {
       final user = userCred.user;
 
       if (user == null) {
-        Get.snackbar("Error", "Firebase login failed");
+        AppSnackbar.error("Firebase login failed");
         return;
       }
 
-      // 5️⃣ Firestore user creation
+      //  Firestore user creation
       final docRef = FirebaseFirestore.instance
           .collection("users")
           .doc(user.uid);
@@ -157,13 +159,12 @@ class AuthController extends GetxController {
         });
       }
 
-      Get.snackbar("Success", "Google login successful");
+      AppSnackbar.success("Google login successful");
       // Get.offAllNamed('/home');
     } on FirebaseAuthException catch (e) {
-      Get.snackbar("Firebase Error", e.message ?? "Auth failed");
+      AppSnackbar.error(e.message ?? "Auth failed");
     } catch (e) {
-      print(e.toString());
-      Get.snackbar("Error", e.toString());
+      AppSnackbar.error("An error occurred");
     } finally {
       isLoading.value = false;
     }
