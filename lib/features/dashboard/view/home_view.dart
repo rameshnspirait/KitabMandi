@@ -3,7 +3,6 @@ import 'package:kitab_mandi/features/dashboard/data/dummy.dart';
 import 'package:kitab_mandi/features/dashboard/widget/home_listing_card_shimmer.dart';
 import 'package:kitab_mandi/features/dashboard/widget/home_listing_card_widget.dart';
 import 'package:kitab_mandi/features/dashboard/widget/home_location_appbar_widget.dart';
-import 'package:kitab_mandi/features/dashboard/widget/home_searchbar_widget.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
