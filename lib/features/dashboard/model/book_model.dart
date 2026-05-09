@@ -4,8 +4,9 @@ class BookModel {
   final String price;
   final String location;
   final String sellerName;
-  final String imageUrl;
+  final List<String> images;
   final String postedTime;
+  final bool isBoosted;
 
   BookModel({
     required this.id,
@@ -13,7 +14,8 @@ class BookModel {
     required this.price,
     required this.location,
     required this.sellerName,
-    required this.imageUrl,
+    required this.images,
     required this.postedTime,
+    this.isBoosted = false,
   });
 }
