@@ -68,7 +68,6 @@ class ProfileView extends StatelessWidget {
               context,
               title: "Account",
               children: [
-                _tile(context, Icons.person_outline, "Edit Profile"),
                 _tile(context, Icons.book_outlined, "My Listings"),
                 _tile(context, Icons.shopping_bag_outlined, "My Orders"),
                 _tile(context, Icons.favorite_border, "Wishlist"),
@@ -96,7 +95,7 @@ class ProfileView extends StatelessWidget {
     );
   }
 
-  /// 👤 PROFILE HEADER (clean + modern)
+  ///  PROFILE HEADER (clean + modern)
   Widget _buildProfileHeader(BuildContext context) {
     final theme = Theme.of(context);
 
