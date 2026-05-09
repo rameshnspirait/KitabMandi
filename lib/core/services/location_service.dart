@@ -4,46 +4,78 @@ import 'package:geocoding/geocoding.dart';
 class LocationService {
   /// 🔐 Check & request permission
   static Future<bool> handlePermission() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) return false;
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) return false;
 
-    LocationPermission permission = await Geolocator.checkPermission();
+      LocationPermission permission = await Geolocator.checkPermission();
 
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
 
-    if (permission == LocationPermission.deniedForever) {
+      if (permission == LocationPermission.deniedForever) {
+        return false;
+      }
+
+      return permission == LocationPermission.whileInUse ||
+          permission == LocationPermission.always;
+    } catch (e) {
       return false;
     }
-
-    return permission == LocationPermission.whileInUse ||
-        permission == LocationPermission.always;
   }
 
-  /// 📍 Get current city name
+  /// 📍 Get current location (lat/lng)
+  static Future<Position?> getCurrentPosition() async {
+    try {
+      final hasPermission = await handlePermission();
+      if (!hasPermission) return null;
+
+      return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+        timeLimit: const Duration(seconds: 10), // ⏱️ prevent freeze
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// 📍 Get formatted location (OLX style)
   static Future<String?> getCurrentCity() async {
-    final hasPermission = await handlePermission();
-    if (!hasPermission) return null;
+    try {
+      final position = await getCurrentPosition();
+      if (position == null) return null;
 
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
+      final placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
 
-    List<Placemark> placemarks = await placemarkFromCoordinates(
-      position.latitude,
-      position.longitude,
-    );
+      if (placemarks.isEmpty) return null;
 
-    if (placemarks.isNotEmpty) {
       final place = placemarks.first;
 
-      return [
-        place.subLocality,
-        place.locality,
-      ].where((e) => e != null && e.isNotEmpty).join(', ');
-    }
+      /// 🔥 Smart fallback logic
+      final subLocality = place.subLocality;
+      final locality = place.locality ?? place.subAdministrativeArea;
+      final state = place.administrativeArea;
 
-    return null;
+      /// 🎯 Format: Area, City
+      final location = [
+        subLocality,
+        locality,
+      ].where((e) => e != null && e.isNotEmpty).join(', ');
+
+      /// Optional: if you want state also
+      // final location = [
+      //   subLocality,
+      //   locality,
+      //   state,
+      // ].where((e) => e != null && e.isNotEmpty).join(', ');
+
+      return location.isNotEmpty ? location : state;
+    } catch (e) {
+      return null;
+    }
   }
 }

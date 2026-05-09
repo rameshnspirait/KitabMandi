@@ -3,7 +3,7 @@ import '../services/location_service.dart';
 import '../storage/location_storage.dart';
 
 class LocationController extends GetxController {
-  RxString selectedLocation = "Select City".obs;
+  RxList<String> selectedLocations = <String>[].obs;
   RxBool isLoadingLocation = false.obs;
   RxList<String> recentLocations = <String>[].obs;
 
@@ -13,18 +13,22 @@ class LocationController extends GetxController {
     loadInitialData();
   }
 
+  ///  Load from storage
   void loadInitialData() {
-    selectedLocation.value = LocationStorage.getSelected();
+    selectedLocations.value = LocationStorage.getSelected();
     recentLocations.value = LocationStorage.getRecent();
   }
 
-  /// 📍 UPDATE LOCATION
+  ///  UPDATE LOCATION (Manual select)
   void updateLocation(String location) {
-    selectedLocation.value = location;
-    _save(location);
+    if (location.isEmpty) return;
+
+    selectedLocations.value = [location];
+
+    _saveSelected([location]);
   }
 
-  /// 📍 GPS LOCATION
+  ///  GPS LOCATION
   Future<void> detectCurrentLocation() async {
     try {
       isLoadingLocation.value = true;
@@ -32,40 +36,36 @@ class LocationController extends GetxController {
       final city = await LocationService.getCurrentCity();
 
       if (city != null && city.isNotEmpty) {
-        selectedLocation.value = city;
-        _save(city);
-        print(selectedLocation.value);
+        selectedLocations.value = [city];
+        _saveSelected([city]);
       } else {
-        selectedLocation.value = "Unknown Location";
+        selectedLocations.value = ["Unknown Location"];
       }
     } catch (e) {
-      selectedLocation.value = "Location Error";
+      selectedLocations.value = ["Location Error"];
     } finally {
       isLoadingLocation.value = false;
     }
   }
 
-  /// 💾 SAVE TO HIVE
-  void _save(String location) {
-    LocationStorage.saveSelected(location);
+  ///  SAVE SELECTED + UPDATE RECENT
+  void _saveSelected(List<String> locations) {
+    LocationStorage.saveSelected(locations);
 
-    final list = recentLocations.toList();
-
-    list.remove(location);
-    list.insert(0, location);
-
-    if (list.length > 5) {
-      list.removeLast();
-    }
-
-    recentLocations.value = list;
-    LocationStorage.saveRecent(list);
+    // Refresh recent list from storage (single source of truth)
+    recentLocations.value = LocationStorage.getRecent();
   }
 
-  /// ❌ RESET
+  ///  Remove from recent
+  void removeRecent(String location) {
+    LocationStorage.removeRecent(location);
+    recentLocations.value = LocationStorage.getRecent();
+  }
+
+  ///  RESET ALL
   void reset() {
-    selectedLocation.value = "Select City";
+    selectedLocations.clear();
     recentLocations.clear();
-    LocationStorage.clear();
+    LocationStorage.clearAll();
   }
 }

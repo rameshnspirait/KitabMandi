@@ -33,12 +33,6 @@ class _HomeViewState extends State<HomeView> {
       body: Column(
         children: [
           const SizedBox(height: 10),
-          SearchBarWidget(
-            controller: TextEditingController(),
-            onChanged: (value) {},
-            onFilterTap: () {},
-          ),
-          const SizedBox(height: 10),
 
           Expanded(
             child: RefreshIndicator(
