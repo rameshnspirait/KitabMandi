@@ -1,7 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:hive/hive.dart';
 import 'package:kitab_mandi/routes/app_routes.dart';
 import '../../../core/utils/app_snackbar.dart';
 import '../../../core/utils/validators.dart';
@@ -38,7 +40,6 @@ class AuthController extends GetxController {
 
     try {
       isLoading.value = true;
-
       final userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
@@ -54,7 +55,7 @@ class AuthController extends GetxController {
       });
 
       AppSnackbar.success("Account created successfully");
-      Get.offAllNamed(AppRoutes.dashboard);
+      // Get.offAllNamed(AppRoutes.wrapper);
     } on FirebaseAuthException catch (e) {
       AppSnackbar.error(_handleAuthError(e));
     } catch (e) {
@@ -84,7 +85,7 @@ class AuthController extends GetxController {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
 
       AppSnackbar.success("Login successful");
-      Get.offAllNamed(AppRoutes.dashboard);
+      // Get.offAllNamed(AppRoutes.wrapper);
     } on FirebaseAuthException catch (e) {
       AppSnackbar.error(_handleAuthError(e));
     } catch (e) {
@@ -160,7 +161,7 @@ class AuthController extends GetxController {
       }
 
       AppSnackbar.success("Google login successful");
-      Get.offAllNamed(AppRoutes.dashboard);
+      // Get.offAllNamed(AppRoutes.wrapper);
     } on FirebaseAuthException catch (e) {
       AppSnackbar.error(e.message ?? "Auth failed");
     } catch (e) {
@@ -168,6 +169,131 @@ class AuthController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  //===========Logout Method=========================
+  Future<void> logout() async {
+    try {
+      //  Sign out from Firebase
+      await _auth.signOut();
+
+      //  Sign out from Google (if logged in with Google)
+      if (await _googleSignIn.isSignedIn()) {
+        await _googleSignIn.signOut();
+      }
+      await Hive.deleteFromDisk();
+    } catch (e) {
+      print("Logout Error: $e");
+    }
+  }
+
+  //==============Logout Dialog==================
+  void showLogoutDialog(BuildContext context) {
+    final theme = Theme.of(context);
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          backgroundColor: theme.cardColor,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                /// 🔥 ICON
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.logout,
+                    size: 28,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                /// TITLE
+                Text(
+                  "Logout?",
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                /// SUBTITLE
+                Text(
+                  "Are you sure you want to logout from your account?",
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.hintColor,
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                /// BUTTONS
+                Row(
+                  children: [
+                    /// CANCEL
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(45),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text("Cancel"),
+                      ),
+                    ),
+
+                    const SizedBox(width: 10),
+
+                    /// LOGOUT
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          Navigator.pop(context);
+
+                          await logout();
+
+                          Future.microtask(() {
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              AppRoutes.wrapper,
+                              (route) => false,
+                            );
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(45),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text("Logout"),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   // ================= ERROR HANDLER =================

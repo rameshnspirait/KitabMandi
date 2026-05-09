@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kitab_mandi/core/constants/app_text_style.dart';
 import 'package:kitab_mandi/core/controller/theme_controller.dart';
+import 'package:kitab_mandi/features/auth/controller/auth_controller.dart';
 import 'package:kitab_mandi/widgets/app_button.dart';
 
 class ProfileView extends StatelessWidget {
-  const ProfileView({super.key});
+  ProfileView({super.key});
   Color _background(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return isDark ? const Color(0xFF1A1D23) : const Color(0xFFFFFFFF);
@@ -34,6 +35,7 @@ class ProfileView extends StatelessWidget {
     );
   }
 
+  final authCtrl = Get.find<AuthController>();
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<ThemeController>();
@@ -271,7 +273,12 @@ class ProfileView extends StatelessWidget {
   Widget _logoutButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      child: AppButton(text: "Logout", onPressed: () {}),
+      child: AppButton(
+        text: "Logout",
+        onPressed: () {
+          authCtrl.showLogoutDialog(context);
+        },
+      ),
     );
   }
 }

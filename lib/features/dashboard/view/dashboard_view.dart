@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kitab_mandi/features/dashboard/view/woshlist_view.dart';
+import 'package:kitab_mandi/features/dashboard/view/wishlist_view.dart';
 import 'package:kitab_mandi/features/dashboard/view/home_view.dart';
 import 'package:kitab_mandi/features/dashboard/view/profile_view.dart';
 import 'package:kitab_mandi/features/dashboard/view/chat_view.dart';
