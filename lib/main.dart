@@ -30,11 +30,11 @@ class MyApp extends StatelessWidget {
         title: 'KitabMandi',
         debugShowCheckedModeBanner: false,
 
-        // 🌗 THEMES
+        //  THEMES
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
 
-        // ✅ DYNAMIC THEME (FIXED)
+        //  DYNAMIC THEME (FIXED)
         themeMode: controller.themeMode.value,
 
         // 🚀 ROUTING
