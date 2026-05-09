@@ -15,10 +15,10 @@ class LocationAppBar extends StatelessWidget implements PreferredSizeWidget {
     return isDark ? Colors.transparent : const Color(0xFFE5E7EB);
   }
 
-  Color _mutedText(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return isDark ? const Color(0xFFB0B3B8) : const Color(0xFF6B7280);
-  }
+  // Color _mutedText(BuildContext context) {
+  //   final isDark = Theme.of(context).brightness == Brightness.dark;
+  //   return isDark ? const Color(0xFFB0B3B8) : const Color(0xFF6B7280);
+  // }
 
   void _openLocationSheet(BuildContext context) {
     showModalBottomSheet(
@@ -50,11 +50,10 @@ class LocationAppBar extends StatelessWidget implements PreferredSizeWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "Deliver to",
-                style: TextStyle(fontSize: 11, color: _mutedText(context)),
-              ),
-
+              // Text(
+              //   "",
+              //   style: TextStyle(fontSize: 11, color: _mutedText(context)),
+              // ),
               Obx(
                 () => GestureDetector(
                   onTap: () => _openLocationSheet(context),

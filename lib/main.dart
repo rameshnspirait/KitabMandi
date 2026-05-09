@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:kitab_mandi/binding/initial_binding.dart';
 import 'package:kitab_mandi/core/themes/app_theme.dart';
 import 'package:kitab_mandi/firebase_options.dart';
@@ -11,7 +12,10 @@ import 'core/controller/theme_controller.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Hive.initFlutter();
 
+  /// open location storage box
+  await Hive.openBox('locationBox');
   runApp(const MyApp());
 }
 

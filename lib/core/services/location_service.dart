@@ -37,7 +37,11 @@ class LocationService {
 
     if (placemarks.isNotEmpty) {
       final place = placemarks.first;
-      return place.locality ?? place.administrativeArea;
+
+      return [
+        place.subLocality,
+        place.locality,
+      ].where((e) => e != null && e.isNotEmpty).join(', ');
     }
 
     return null;
