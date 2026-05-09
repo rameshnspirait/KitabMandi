@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kitab_mandi/features/dashboard/model/book_model.dart';
+import 'package:kitab_mandi/widgets/app_cached_image_network.dart';
 
 class ListingGridCard extends StatefulWidget {
   final BookModel book;
@@ -66,8 +67,8 @@ class _ListingGridCardState extends State<ListingGridCard> {
                             borderRadius: const BorderRadius.vertical(
                               top: Radius.circular(18),
                             ),
-                            child: Image.network(
-                              widget.book.images[i],
+                            child: AppCachedImageNetwork(
+                              imageUrl: widget.book.images[i],
                               fit: BoxFit.cover,
                               width: double.infinity,
                             ),
@@ -175,6 +176,23 @@ class _ListingGridCardState extends State<ListingGridCard> {
                       ),
                     ),
 
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(Icons.person, size: 12, color: Colors.grey),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            'Published By ' + widget.book.sellerName,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Colors.grey,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 8),
 
                     /// LOCATION + TIME
