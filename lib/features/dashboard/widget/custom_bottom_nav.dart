@@ -120,18 +120,13 @@ class _CustomBottomNavState extends State<CustomBottomNav>
                     shape: BoxShape.circle,
 
                     /// ✨ PREMIUM GRADIENT (SOFT, NOT HARSH)
-                    gradient: LinearGradient(
-                      colors: theme.brightness == Brightness.dark
-                          ? [AppColors.secondaryDark, AppColors.secondary]
-                          : [AppColors.primaryDark, AppColors.primary],
-                    ),
+                    color: AppColors.primaryDark,
 
-                    /// 🌟 SHADOW DEPTH
+                    ///  SHADOW DEPTH
                     boxShadow: [
                       BoxShadow(
                         color: theme.colorScheme.primary.withOpacity(0.35),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
+                        blurRadius: 5,
                       ),
                     ],
                   ),

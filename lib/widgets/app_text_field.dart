@@ -16,6 +16,9 @@ class AppTextField extends StatelessWidget {
   final bool isBorderless;
   final EdgeInsetsGeometry? contentPadding;
 
+  /// ✨ ADDED (IMPORTANT)
+  final Function(String)? onChanged;
+
   const AppTextField({
     super.key,
     required this.controller,
@@ -28,9 +31,11 @@ class AppTextField extends StatelessWidget {
     this.maxLines = 1,
     this.enabled = true,
 
-    /// NEW
     this.isBorderless = false,
     this.contentPadding,
+
+    /// NEW
+    this.onChanged,
   });
 
   @override
@@ -45,7 +50,10 @@ class AppTextField extends StatelessWidget {
       validator: validator,
       maxLines: maxLines,
       enabled: enabled,
+      onChanged: onChanged, // ✅ ADDED HERE
+
       cursorColor: theme.colorScheme.primary,
+
       style: AppTextStyles.body(context).copyWith(color: textColor),
 
       decoration: InputDecoration(
@@ -56,21 +64,18 @@ class AppTextField extends StatelessWidget {
           context,
         ).copyWith(color: theme.hintColor),
 
-        /// ICONS
         prefixIcon: prefixIcon,
         suffixIcon: suffixIcon,
 
         filled: true,
         fillColor: theme.cardColor,
 
-        /// 🔥 DYNAMIC PADDING
         contentPadding:
             contentPadding ??
             (isBorderless
                 ? const EdgeInsets.symmetric(vertical: 12)
                 : const EdgeInsets.symmetric(horizontal: 16, vertical: 14)),
 
-        /// 🔥 BORDER HANDLING
         border: isBorderless
             ? InputBorder.none
             : OutlineInputBorder(

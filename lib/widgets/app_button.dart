@@ -6,7 +6,7 @@ class AppButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
   final bool isLoading;
-  final Color? color;
+  final Color? backgroundColor;
   final Color? textColor; //  NEW
 
   const AppButton({
@@ -14,13 +14,13 @@ class AppButton extends StatelessWidget {
     required this.text,
     required this.onPressed,
     this.isLoading = false,
-    this.color,
+    this.backgroundColor,
     this.textColor, //  NEW
   });
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = color ?? AppColors.primary;
+    final bgColor = backgroundColor ?? AppColors.primary;
 
     /// Auto text color if not provided
     final txtColor =

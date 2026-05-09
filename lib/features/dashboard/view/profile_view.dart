@@ -6,12 +6,12 @@ import 'package:kitab_mandi/widgets/app_button.dart';
 
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
-
   Color _background(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return isDark ? const Color(0xFF1A1D23) : const Color(0xFFFFFFFF);
   }
 
+  /// 🎨 SURFACES
   Color _surface(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return isDark ? const Color(0xFF1A1D23) : const Color(0xFFFFFFFF);
@@ -19,7 +19,12 @@ class ProfileView extends StatelessWidget {
 
   Color _softSurface(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return isDark ? const Color(0xFF151821) : const Color(0xFFF9FAFB);
+    return isDark ? const Color(0xFF151821) : const Color(0xFFF6F7FB);
+  }
+
+  Color _mutedText(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return isDark ? const Color(0xFFB0B3B8) : const Color(0xFF6B7280);
   }
 
   Border _border(BuildContext context) {
@@ -31,37 +36,34 @@ class ProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final controller = Get.find<ThemeController>();
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+
+      /// 🧭 APP BAR (unchanged logic)
       appBar: AppBar(
         title: Text("Profile", style: AppTextStyles.heading2(context)),
         elevation: 0,
         backgroundColor: _background(context),
       ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            /// PROFILE HEADER
             _buildProfileHeader(context),
-            const SizedBox(height: 20),
+            const SizedBox(height: 14),
 
-            ///  STATS
             _buildStats(context),
-            const SizedBox(height: 20),
+            const SizedBox(height: 14),
 
-            /// ⚡ QUICK ACTIONS
             _buildQuickActions(context),
-            const SizedBox(height: 20),
+            const SizedBox(height: 14),
 
-            /// THEME SWITCH
             Obx(() => _themeSwitch(context, controller)),
-            const SizedBox(height: 20),
+            const SizedBox(height: 14),
 
-            ///  ACCOUNT
             _buildSection(
               context,
               title: "Account",
@@ -73,9 +75,8 @@ class ProfileView extends StatelessWidget {
               ],
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 14),
 
-            ///  SUPPORT
             _buildSection(
               context,
               title: "Support",
@@ -86,9 +87,8 @@ class ProfileView extends StatelessWidget {
               ],
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 14),
 
-            ///  LOGOUT
             _logoutButton(context),
           ],
         ),
@@ -96,48 +96,55 @@ class ProfileView extends StatelessWidget {
     );
   }
 
-  ///  PROFILE HEADER
+  /// 👤 PROFILE HEADER (clean + modern)
   Widget _buildProfileHeader(BuildContext context) {
     final theme = Theme.of(context);
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: _surface(context),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
         border: _border(context),
       ),
       child: Row(
         children: [
           CircleAvatar(
-            radius: 32,
-            backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
+            radius: 28,
+            backgroundColor: theme.colorScheme.primary.withOpacity(0.12),
             child: Icon(
               Icons.person,
-              size: 32,
+              size: 28,
               color: theme.colorScheme.primary,
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
 
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text("Ramesh", style: AppTextStyles.title(context)),
-                const SizedBox(height: 4),
-                Text("ramesh@email.com", style: AppTextStyles.caption(context)),
+                const SizedBox(height: 2),
+                Text(
+                  "ramesh@email.com",
+                  style: TextStyle(fontSize: 12, color: _mutedText(context)),
+                ),
               ],
             ),
           ),
 
-          Icon(Icons.edit, color: theme.iconTheme.color),
+          Icon(
+            Icons.edit,
+            size: 18,
+            color: theme.iconTheme.color?.withOpacity(0.7),
+          ),
         ],
       ),
     );
   }
 
-  ///  STATS
+  /// 📊 STATS (modern compact cards)
   Widget _buildStats(BuildContext context) {
     return Row(
       children: [
@@ -151,17 +158,17 @@ class ProfileView extends StatelessWidget {
   Widget _statItem(BuildContext context, String count, String label) {
     return Expanded(
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        padding: const EdgeInsets.symmetric(vertical: 14),
+        margin: const EdgeInsets.symmetric(horizontal: 3),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           color: _softSurface(context),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(14),
           border: _border(context),
         ),
         child: Column(
           children: [
             Text(count, style: AppTextStyles.title(context)),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(label, style: AppTextStyles.caption(context)),
           ],
         ),
@@ -169,12 +176,13 @@ class ProfileView extends StatelessWidget {
     );
   }
 
-  ///  QUICK ACTIONS
+  /// ⚡ QUICK ACTIONS (modern chip-style feel)
   Widget _buildQuickActions(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         _action(context, Icons.add_circle_outline, "Sell"),
-        _action(context, Icons.list_alt_outlined, "My Ads"),
+        _action(context, Icons.list_alt_outlined, "Ads"),
         _action(context, Icons.favorite_border, "Wishlist"),
         _action(context, Icons.chat_bubble_outline, "Chat"),
       ],
@@ -184,41 +192,41 @@ class ProfileView extends StatelessWidget {
   Widget _action(BuildContext context, IconData icon, String label) {
     final theme = Theme.of(context);
 
-    return Expanded(
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 22,
-            backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
-            child: Icon(icon, color: theme.colorScheme.primary),
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.primary.withOpacity(0.10),
+            shape: BoxShape.circle,
           ),
-          const SizedBox(height: 6),
-          Text(label, style: AppTextStyles.caption(context)),
-        ],
-      ),
+          child: Icon(icon, size: 20, color: theme.colorScheme.primary),
+        ),
+        const SizedBox(height: 6),
+        Text(label, style: AppTextStyles.caption(context)),
+      ],
     );
   }
 
-  ///  THEME SWITCH
+  /// 🌗 THEME SWITCH (clean surface)
   Widget _themeSwitch(BuildContext context, ThemeController controller) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16),
+        color: _surface(context),
+        borderRadius: BorderRadius.circular(14),
+        border: _border(context),
       ),
       child: SwitchListTile(
         contentPadding: EdgeInsets.zero,
         title: Text("Dark Mode", style: AppTextStyles.body(context)),
-
         value: controller.isDarkMode(context),
-
         onChanged: controller.toggleTheme,
       ),
     );
   }
 
-  /// 📂 SECTION
+  /// 📂 SECTION HEADER
   Widget _buildSection(
     BuildContext context, {
     required String title,
@@ -242,42 +250,29 @@ class ProfileView extends StatelessWidget {
     );
   }
 
-  /// 🔹 TILE (PREMIUM CARD STYLE)
+  /// 🔹 TILE (clean modern list item)
   Widget _tile(BuildContext context, IconData icon, String title) {
     final theme = Theme.of(context);
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      decoration: BoxDecoration(
-        color: _surface(context),
-        borderRadius: BorderRadius.circular(12),
-        border: _border(context),
+    return ListTile(
+      dense: true,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+      leading: Icon(icon, size: 20, color: theme.iconTheme.color),
+      title: Text(title, style: AppTextStyles.body(context)),
+      trailing: Icon(
+        Icons.arrow_forward_ios,
+        size: 12,
+        color: theme.iconTheme.color?.withOpacity(0.5),
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-        leading: Icon(icon, color: theme.iconTheme.color),
-        title: Text(title, style: AppTextStyles.body(context)),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 14),
-        onTap: () {},
-      ),
+      onTap: () {},
     );
   }
 
-  /// 🚪 LOGOUT
+  /// 🚪 LOGOUT (modern minimal button)
   Widget _logoutButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      child: AppButton(text: 'Logout', onPressed: () {}),
-      // ElevatedButton(
-      //   style: ElevatedButton.styleFrom(
-      //     backgroundColor: AppColors.primaryDark, // softer but richer red tint
-
-      //     foregroundColor: const Color(0xFFE53935), // stronger red text
-      //     elevation: 0,
-      //   ),
-      //   onPressed: () {},
-      //   child: Text("Logout", style: AppTextStyles.button(context)),
-      // ),
+      child: AppButton(text: "Logout", onPressed: () {}),
     );
   }
 }
