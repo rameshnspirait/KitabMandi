@@ -21,17 +21,18 @@ class AuthController extends GetxController {
   var isLoading = false.obs;
   var isLogin = true.obs;
   var obscurePassword = true.obs;
+  var isGoogleUser = false.obs; // ✅ IMPORTANT
 
-  /// 🔹 FORM CONTROLLERS
+  /// 🔹 CONTROLLERS
   final nameController = TextEditingController();
   final phoneController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  final forgotPassword = TextEditingController();
 
   /// ================= TOGGLE =================
   void toggleMode() {
     isLogin.toggle();
+    isGoogleUser.value = false; // reset
     clearFields();
   }
 
@@ -49,7 +50,8 @@ class AuthController extends GetxController {
   /// ================= VALIDATORS =================
   String? validateName(String? v) => Validators.validateName(v ?? "");
   String? validateEmail(String? v) => Validators.validateEmail(v ?? "");
-  String? validatePassword(String? v) => Validators.validatePassword(v ?? "");
+  String? validatePassword(String? v) =>
+      isGoogleUser.value ? null : Validators.validatePassword(v ?? "");
 
   String? validatePhone(String? v) {
     if (v == null || v.isEmpty) return "Enter phone number";
@@ -72,45 +74,39 @@ class AuthController extends GetxController {
   Future<void> signUp() async {
     final name = nameController.text.trim();
     final phone = phoneController.text.trim();
-    final email = emailController.text.trim();
-    final password = passwordController.text.trim();
 
     final nameError = validateName(name);
-    final emailError = validateEmail(email);
-    final passError = validatePassword(password);
     final phoneError = validatePhone(phone);
 
     if (nameError != null) return AppSnackbar.error(nameError);
     if (phoneError != null) return AppSnackbar.error(phoneError);
-    if (emailError != null) return AppSnackbar.error(emailError);
-    if (passError != null) return AppSnackbar.error(passError);
 
     try {
       isLoading.value = true;
 
-      final userCredential = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final user = _auth.currentUser;
 
-      final user = userCredential.user;
-
-      if (user == null) throw Exception("User creation failed");
+      if (user == null) {
+        return AppSnackbar.error("User not authenticated");
+      }
 
       await _firestore.collection('users').doc(user.uid).set({
         "uid": user.uid,
         "name": name,
         "phone": phone,
-        "email": email,
+        "email": user.email,
+        "photoUrl": user.photoURL ?? "",
+        "provider": isGoogleUser.value ? "google" : "email",
         "createdAt": FieldValue.serverTimestamp(),
       });
 
-      AppSnackbar.success("Account created successfully 🚀");
+      AppSnackbar.success("Account setup completed 🚀");
 
-      isLogin.value = true;
       clearFields();
-    } on FirebaseAuthException catch (e) {
-      AppSnackbar.error(_handleAuthError(e));
+      isLogin.value = true;
+      isGoogleUser.value = false;
+
+      Get.offAllNamed(AppRoutes.wrapper);
     } catch (e) {
       AppSnackbar.error("Signup failed. Try again.");
     } finally {
@@ -135,6 +131,8 @@ class AuthController extends GetxController {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
 
       AppSnackbar.success("Login successful 🎉");
+
+      Get.offAllNamed(AppRoutes.wrapper);
     } on FirebaseAuthException catch (e) {
       AppSnackbar.error(_handleAuthError(e));
     } catch (e) {
@@ -165,7 +163,6 @@ class AuthController extends GetxController {
       );
 
       final userCred = await _auth.signInWithCredential(credential);
-
       final user = userCred.user;
 
       if (user == null) throw Exception("Google login failed");
@@ -173,18 +170,28 @@ class AuthController extends GetxController {
       final docRef = _firestore.collection("users").doc(user.uid);
       final doc = await docRef.get();
 
-      if (!doc.exists) {
-        await docRef.set({
-          "uid": user.uid,
-          "name": user.displayName ?? "User",
-          "email": user.email ?? "",
-          "photoUrl": user.photoURL ?? "",
-          "provider": "google",
-          "createdAt": FieldValue.serverTimestamp(),
-        });
+      /// ✅ EXISTING USER → HOME
+      if (doc.exists) {
+        final data = doc.data();
+
+        if (data?["phone"] != null && data?["phone"] != "") {
+          AppSnackbar.success("Login successful 🚀");
+          Get.offAllNamed(AppRoutes.wrapper);
+          return;
+        }
       }
 
-      AppSnackbar.success("Google login successful 🚀");
+      /// 🆕 NEW GOOGLE USER → SIGNUP FLOW
+      isGoogleUser.value = true;
+      isLogin.value = false;
+
+      nameController.text = user.displayName ?? "";
+      emailController.text = user.email ?? "";
+
+      phoneController.clear();
+      passwordController.clear();
+
+      AppSnackbar.success("Complete your profile to continue");
     } catch (e) {
       AppSnackbar.error("Google sign-in failed");
     } finally {
@@ -207,6 +214,7 @@ class AuthController extends GetxController {
     }
   }
 
+  /// ================= LOGOUT DIALOG =================
   void showLogoutDialog(BuildContext context) {
     final theme = Theme.of(context);
 
@@ -219,64 +227,26 @@ class AuthController extends GetxController {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              /// ICON
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.logout,
-                  size: 28,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              /// TITLE
-              Text(
-                "Logout?",
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
+              Icon(Icons.logout, size: 30, color: theme.colorScheme.primary),
+              const SizedBox(height: 12),
+              Text("Logout?", style: theme.textTheme.titleLarge),
               const SizedBox(height: 8),
-
-              /// SUBTITLE
-              Text(
-                "Are you sure you want to logout from your account?",
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.hintColor,
-                ),
-              ),
-
+              Text("Are you sure you want to logout?"),
               const SizedBox(height: 20),
-
-              /// BUTTONS
               Row(
                 children: [
-                  /// CANCEL
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => Get.back(),
                       child: const Text("Cancel"),
                     ),
                   ),
-
                   const SizedBox(width: 10),
-
-                  /// LOGOUT
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
                         Get.back();
-
                         await logout();
-
                         Get.offAllNamed(AppRoutes.wrapper);
                       },
                       child: const Text("Logout"),
@@ -291,7 +261,7 @@ class AuthController extends GetxController {
     );
   }
 
-  /// ================= ERROR HANDLER =================
+  /// ================= ERROR =================
   String _handleAuthError(FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':

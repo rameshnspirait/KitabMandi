@@ -17,6 +17,25 @@ class AuthView extends StatelessWidget {
       ? const Color(0xFF1A1D23)
       : Colors.white;
 
+  Widget _prefix(BuildContext context, IconData icon) {
+    final theme = Theme.of(context);
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(width: 10),
+        Icon(icon, color: theme.iconTheme.color),
+        const SizedBox(width: 10),
+        Container(
+          height: 45,
+          width: 1,
+          color: theme.dividerColor, // ✅ DARK/LIGHT SAFE
+        ),
+        const SizedBox(width: 10),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -94,51 +113,23 @@ class AuthView extends StatelessWidget {
                         ),
                         child: Column(
                           children: [
-                            /// 👤 NAME (SIGNUP ONLY)
+                            /// 👤 NAME (SIGNUP)
                             if (!controller.isLogin.value) ...[
                               AppTextField(
                                 controller: controller.nameController,
                                 hintText: AppStrings.name,
                                 validator: controller.validateName,
-                                prefixIcon: Row(
-                                  mainAxisSize: .min,
-                                  crossAxisAlignment: .center,
-                                  children: [
-                                    SizedBox(width: 10),
-                                    Icon(Icons.person),
-                                    SizedBox(width: 10),
-                                    Container(
-                                      height: 45,
-                                      width: 1,
-                                      color: AppColors.darkBorder,
-                                    ),
-                                    SizedBox(width: 10),
-                                  ],
-                                ),
+                                prefixIcon: _prefix(context, Icons.person),
                               ),
                               const SizedBox(height: 16),
 
-                              /// 📱 PHONE FIELD
+                              /// 📱 PHONE
                               AppTextField(
                                 controller: controller.phoneController,
                                 hintText: "Enter phone number",
                                 keyboardType: TextInputType.phone,
-                                prefixIcon: Row(
-                                  mainAxisSize: .min,
-                                  crossAxisAlignment: .center,
-                                  children: [
-                                    SizedBox(width: 10),
-                                    Icon(Icons.call),
-                                    SizedBox(width: 10),
-                                    Container(
-                                      height: 45,
-                                      width: 1,
-                                      color: AppColors.darkBorder,
-                                    ),
-                                    SizedBox(width: 10),
-                                  ],
-                                ),
                                 validator: controller.validatePhone,
+                                prefixIcon: _prefix(context, Icons.call),
                               ),
                               const SizedBox(height: 16),
                             ],
@@ -149,60 +140,38 @@ class AuthView extends StatelessWidget {
                               hintText: AppStrings.email,
                               keyboardType: TextInputType.emailAddress,
                               validator: controller.validateEmail,
-                              prefixIcon: Row(
-                                mainAxisSize: .min,
-                                crossAxisAlignment: .center,
-                                children: [
-                                  SizedBox(width: 10),
-                                  Icon(Icons.email),
-                                  SizedBox(width: 10),
-                                  Container(
-                                    height: 45,
-                                    width: 1,
-                                    color: AppColors.darkBorder,
-                                  ),
-                                  SizedBox(width: 10),
-                                ],
-                              ),
+                              enabled:
+                                  controller.isLogin.value ||
+                                  !controller.isGoogleUser.value,
+                              readOnly: controller.isGoogleUser.value,
+                              prefixIcon: _prefix(context, Icons.email),
                             ),
 
                             const SizedBox(height: 16),
 
-                            /// 🔒 PASSWORD
-                            Obx(
-                              () => AppTextField(
-                                controller: controller.passwordController,
-                                hintText: AppStrings.password,
-                                obscureText: controller.obscurePassword.value,
-                                validator: controller.validatePassword,
-                                prefixIcon: Row(
-                                  mainAxisSize: .min,
-                                  crossAxisAlignment: .center,
-                                  children: [
-                                    SizedBox(width: 10),
-                                    Icon(Icons.lock),
-                                    SizedBox(width: 10),
-                                    Container(
-                                      height: 45,
-                                      width: 1,
-                                      color: AppColors.darkBorder,
+                            /// 🔒 PASSWORD (HIDE FOR GOOGLE USER)
+                            if (!controller.isGoogleUser.value)
+                              Obx(
+                                () => AppTextField(
+                                  controller: controller.passwordController,
+                                  hintText: AppStrings.password,
+                                  obscureText: controller.obscurePassword.value,
+                                  validator: controller.validatePassword,
+                                  prefixIcon: _prefix(context, Icons.lock),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      controller.obscurePassword.value
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
                                     ),
-                                    SizedBox(width: 10),
-                                  ],
-                                ),
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    controller.obscurePassword.value
-                                        ? Icons.visibility_off
-                                        : Icons.visibility,
+                                    onPressed: controller.togglePassword,
                                   ),
-                                  onPressed: controller.togglePassword,
                                 ),
                               ),
-                            ),
 
                             /// 🔁 FORGOT PASSWORD
-                            if (controller.isLogin.value)
+                            if (controller.isLogin.value &&
+                                !controller.isGoogleUser.value)
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: TextButton(
@@ -217,6 +186,8 @@ class AuthView extends StatelessWidget {
                             AppButton(
                               text: controller.isLogin.value
                                   ? AppStrings.login
+                                  : controller.isGoogleUser.value
+                                  ? "Update Profile"
                                   : AppStrings.signup,
                               isLoading: controller.isLoading.value,
                               onPressed: () {
