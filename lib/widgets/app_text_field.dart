@@ -11,6 +11,7 @@ class AppTextField extends StatelessWidget {
   final String? Function(String?)? validator;
   final int maxLines;
   final bool enabled;
+  final bool readOnly;
 
   /// 🔥 NEW FEATURES
   final bool isBorderless;
@@ -30,6 +31,7 @@ class AppTextField extends StatelessWidget {
     this.validator,
     this.maxLines = 1,
     this.enabled = true,
+    this.readOnly = false,
 
     this.isBorderless = false,
     this.contentPadding,
@@ -50,6 +52,7 @@ class AppTextField extends StatelessWidget {
       validator: validator,
       maxLines: maxLines,
       enabled: enabled,
+      readOnly: readOnly,
       onChanged: onChanged, // ✅ ADDED HERE
 
       cursorColor: theme.colorScheme.primary,

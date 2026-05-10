@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/route_manager.dart';
+import 'package:get/state_manager.dart';
 import 'package:kitab_mandi/features/dashboard/view/wishlist_view.dart';
 import 'package:kitab_mandi/features/dashboard/view/home_view.dart';
 import 'package:kitab_mandi/features/dashboard/view/profile_view.dart';
 import 'package:kitab_mandi/features/dashboard/view/chat_view.dart';
 import 'package:kitab_mandi/features/dashboard/widget/custom_bottom_nav.dart';
+import 'package:kitab_mandi/routes/app_routes.dart';
 
 class DashboardView extends StatefulWidget {
   const DashboardView({super.key});
@@ -24,7 +27,7 @@ class _DashboardViewState extends State<DashboardView> {
   }
 
   void onCenterTap() {
-    // TODO: Add your center action (e.g. Add Book / Sell)
+    Get.toNamed(AppRoutes.sellerlisting);
   }
 
   @override
