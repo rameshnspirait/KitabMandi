@@ -11,142 +11,166 @@ import '../../../core/utils/validators.dart';
 class AuthController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     serverClientId:
         "136794753205-210rggct227ahdu5t70ckn30rejonctk.apps.googleusercontent.com",
   );
 
+  /// 🔹 UI STATE
   var isLoading = false.obs;
+  var isLogin = true.obs;
+  var obscurePassword = true.obs;
 
-  //  SIGNUP
-  Future<void> signUp(String name, String email, String password) async {
-    // Validation
-    final nameError = Validators.validateName(name);
-    final emailError = Validators.validateEmail(email);
-    final passError = Validators.validatePassword(password);
+  /// 🔹 FORM CONTROLLERS
+  final nameController = TextEditingController();
+  final phoneController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final forgotPassword = TextEditingController();
 
-    if (nameError != null) {
-      AppSnackbar.error(nameError);
-      return;
+  /// ================= TOGGLE =================
+  void toggleMode() {
+    isLogin.toggle();
+    clearFields();
+  }
+
+  void togglePassword() {
+    obscurePassword.toggle();
+  }
+
+  void clearFields() {
+    nameController.clear();
+    phoneController.clear();
+    emailController.clear();
+    passwordController.clear();
+  }
+
+  /// ================= VALIDATORS =================
+  String? validateName(String? v) => Validators.validateName(v ?? "");
+  String? validateEmail(String? v) => Validators.validateEmail(v ?? "");
+  String? validatePassword(String? v) => Validators.validatePassword(v ?? "");
+
+  String? validatePhone(String? v) {
+    if (v == null || v.isEmpty) return "Enter phone number";
+    if (v.length != 10) return "Enter valid 10-digit number";
+    return null;
+  }
+
+  /// ================= SUBMIT =================
+  Future<void> submit() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    if (isLogin.value) {
+      await login();
+    } else {
+      await signUp();
     }
-    if (emailError != null) {
-      AppSnackbar.error(emailError);
-      return;
-    }
-    if (passError != null) {
-      AppSnackbar.error(passError);
-      return;
-    }
+  }
+
+  /// ================= SIGNUP =================
+  Future<void> signUp() async {
+    final name = nameController.text.trim();
+    final phone = phoneController.text.trim();
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    final nameError = validateName(name);
+    final emailError = validateEmail(email);
+    final passError = validatePassword(password);
+    final phoneError = validatePhone(phone);
+
+    if (nameError != null) return AppSnackbar.error(nameError);
+    if (phoneError != null) return AppSnackbar.error(phoneError);
+    if (emailError != null) return AppSnackbar.error(emailError);
+    if (passError != null) return AppSnackbar.error(passError);
 
     try {
       isLoading.value = true;
+
       final userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      final user = userCredential.user!;
+      final user = userCredential.user;
+
+      if (user == null) throw Exception("User creation failed");
 
       await _firestore.collection('users').doc(user.uid).set({
         "uid": user.uid,
         "name": name,
+        "phone": phone,
         "email": email,
         "createdAt": FieldValue.serverTimestamp(),
       });
 
-      AppSnackbar.success("Account created successfully");
-      // Get.offAllNamed(AppRoutes.wrapper);
+      AppSnackbar.success("Account created successfully 🚀");
+
+      isLogin.value = true;
+      clearFields();
     } on FirebaseAuthException catch (e) {
       AppSnackbar.error(_handleAuthError(e));
     } catch (e) {
-      AppSnackbar.error("Something went wrong");
+      AppSnackbar.error("Signup failed. Try again.");
     } finally {
       isLoading.value = false;
     }
   }
 
-  //  LOGIN
-  Future<void> login(String email, String password) async {
-    final emailError = Validators.validateEmail(email);
-    final passError = Validators.validatePassword(password);
+  /// ================= LOGIN =================
+  Future<void> login() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
 
-    if (emailError != null) {
-      AppSnackbar.error(emailError);
-      return;
-    }
-    if (passError != null) {
-      AppSnackbar.error(passError);
-      return;
-    }
+    final emailError = validateEmail(email);
+    final passError = validatePassword(password);
+
+    if (emailError != null) return AppSnackbar.error(emailError);
+    if (passError != null) return AppSnackbar.error(passError);
 
     try {
       isLoading.value = true;
 
       await _auth.signInWithEmailAndPassword(email: email, password: password);
 
-      AppSnackbar.success("Login successful");
-      // Get.offAllNamed(AppRoutes.wrapper);
+      AppSnackbar.success("Login successful 🎉");
     } on FirebaseAuthException catch (e) {
       AppSnackbar.error(_handleAuthError(e));
     } catch (e) {
-      AppSnackbar.error("Something went wrong");
+      AppSnackbar.error("Login failed. Try again.");
     } finally {
       isLoading.value = false;
     }
   }
 
-  // ================= GOOGLE SIGN-IN (FIXED) =================
+  /// ================= GOOGLE LOGIN =================
   Future<void> signInWithGoogle() async {
     try {
       isLoading.value = true;
 
-      //  Force logout (optional but good for clean login)
       await _googleSignIn.signOut();
 
-      //  Trigger Google Sign-In
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      final googleUser = await _googleSignIn.signIn();
 
       if (googleUser == null) {
-        AppSnackbar.error("Google sign-in cancelled");
-
-        return;
+        return AppSnackbar.error("Google sign-in cancelled");
       }
 
-      //  Get authentication tokens
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+      final googleAuth = await googleUser.authentication;
 
-      final idToken = googleAuth.idToken;
-      final accessToken = googleAuth.accessToken;
-
-      if (idToken == null) {
-        AppSnackbar.error("ID Token is null");
-        return;
-      }
-
-      //  Create Firebase credential
       final credential = GoogleAuthProvider.credential(
-        idToken: idToken,
-        accessToken: accessToken,
+        idToken: googleAuth.idToken,
+        accessToken: googleAuth.accessToken,
       );
 
-      //  Firebase sign-in
-      final userCred = await FirebaseAuth.instance.signInWithCredential(
-        credential,
-      );
+      final userCred = await _auth.signInWithCredential(credential);
 
       final user = userCred.user;
 
-      if (user == null) {
-        AppSnackbar.error("Firebase login failed");
-        return;
-      }
+      if (user == null) throw Exception("Google login failed");
 
-      //  Firestore user creation
-      final docRef = FirebaseFirestore.instance
-          .collection("users")
-          .doc(user.uid);
-
+      final docRef = _firestore.collection("users").doc(user.uid);
       final doc = await docRef.get();
 
       if (!doc.exists) {
@@ -160,143 +184,114 @@ class AuthController extends GetxController {
         });
       }
 
-      AppSnackbar.success("Google login successful");
-      // Get.offAllNamed(AppRoutes.wrapper);
-    } on FirebaseAuthException catch (e) {
-      AppSnackbar.error(e.message ?? "Auth failed");
+      AppSnackbar.success("Google login successful 🚀");
     } catch (e) {
-      AppSnackbar.error("An error occurred");
+      AppSnackbar.error("Google sign-in failed");
     } finally {
       isLoading.value = false;
     }
   }
 
-  //===========Logout Method=========================
+  /// ================= LOGOUT =================
   Future<void> logout() async {
     try {
-      //  Sign out from Firebase
       await _auth.signOut();
 
-      //  Sign out from Google (if logged in with Google)
       if (await _googleSignIn.isSignedIn()) {
         await _googleSignIn.signOut();
       }
+
       await Hive.deleteFromDisk();
     } catch (e) {
-      print("Logout Error: $e");
+      debugPrint("Logout Error: $e");
     }
   }
 
-  //==============Logout Dialog==================
   void showLogoutDialog(BuildContext context) {
     final theme = Theme.of(context);
 
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          backgroundColor: theme.cardColor,
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                /// 🔥 ICON
-                Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.logout,
-                    size: 28,
-                    color: theme.colorScheme.primary,
-                  ),
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: theme.cardColor,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              /// ICON
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  shape: BoxShape.circle,
                 ),
-
-                const SizedBox(height: 16),
-
-                /// TITLE
-                Text(
-                  "Logout?",
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: Icon(
+                  Icons.logout,
+                  size: 28,
+                  color: theme.colorScheme.primary,
                 ),
+              ),
 
-                const SizedBox(height: 8),
+              const SizedBox(height: 16),
 
-                /// SUBTITLE
-                Text(
-                  "Are you sure you want to logout from your account?",
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.hintColor,
-                  ),
+              /// TITLE
+              Text(
+                "Logout?",
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
+              ),
 
-                const SizedBox(height: 20),
+              const SizedBox(height: 8),
 
-                /// BUTTONS
-                Row(
-                  children: [
-                    /// CANCEL
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: OutlinedButton.styleFrom(
-                          minimumSize: const Size.fromHeight(45),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text("Cancel"),
-                      ),
+              /// SUBTITLE
+              Text(
+                "Are you sure you want to logout from your account?",
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.hintColor,
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              /// BUTTONS
+              Row(
+                children: [
+                  /// CANCEL
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Get.back(),
+                      child: const Text("Cancel"),
                     ),
+                  ),
 
-                    const SizedBox(width: 10),
+                  const SizedBox(width: 10),
 
-                    /// LOGOUT
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          Navigator.pop(context);
+                  /// LOGOUT
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        Get.back();
 
-                          await logout();
+                        await logout();
 
-                          Future.microtask(() {
-                            Navigator.pushNamedAndRemoveUntil(
-                              context,
-                              AppRoutes.wrapper,
-                              (route) => false,
-                            );
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: const Size.fromHeight(45),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text("Logout"),
-                      ),
+                        Get.offAllNamed(AppRoutes.wrapper);
+                      },
+                      child: const Text("Logout"),
                     ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
-  // ================= ERROR HANDLER =================
+  /// ================= ERROR HANDLER =================
   String _handleAuthError(FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':
@@ -309,8 +304,6 @@ class AuthController extends GetxController {
         return "Invalid email";
       case 'weak-password':
         return "Weak password";
-      case 'invalid-credential':
-        return "Invalid credentials";
       default:
         return e.message ?? "Authentication failed";
     }

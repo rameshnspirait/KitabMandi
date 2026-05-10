@@ -21,7 +21,7 @@ class AppPages {
     // //  Auth
     GetPage(
       name: AppRoutes.auth,
-      page: () => const AuthView(),
+      page: () => AuthView(),
       binding: AuthBinding(),
     ),
     // //  Dashboard

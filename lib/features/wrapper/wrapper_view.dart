@@ -19,7 +19,7 @@ class WrapperView extends StatelessWidget {
 
           //  Not logged in
           if (!snapshot.hasData) {
-            return const AuthView();
+            return AuthView();
           }
 
           //  Logged in

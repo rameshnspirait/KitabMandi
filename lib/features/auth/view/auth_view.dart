@@ -2,80 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kitab_mandi/core/constants/app_color.dart';
 import 'package:kitab_mandi/core/constants/app_string.dart';
-import 'package:kitab_mandi/core/utils/validators.dart';
 import 'package:kitab_mandi/features/auth/controller/auth_controller.dart';
 import 'package:kitab_mandi/widgets/app_button.dart';
 import 'package:kitab_mandi/widgets/app_text_field.dart';
 
-class AuthView extends StatefulWidget {
-  const AuthView({super.key});
+class AuthView extends StatelessWidget {
+  AuthView({super.key});
 
-  @override
-  State<AuthView> createState() => _AuthViewState();
-}
-
-class _AuthViewState extends State<AuthView> {
-  final controller = Get.find<AuthController>();
-
+  final AuthController controller = Get.find<AuthController>();
   final _formKey = GlobalKey<FormState>();
 
-  bool isLogin = true;
-  bool obscurePassword = true;
-
-  final nameController = TextEditingController();
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-
-  void toggleMode() {
-    setState(() {
-      isLogin = !isLogin;
-      clearFields();
-    });
-  }
-
-  void clearFields() {
-    nameController.clear();
-    emailController.clear();
-    passwordController.clear();
-    _formKey.currentState?.reset();
-  }
-
-  void submit() {
-    if (!_formKey.currentState!.validate()) return;
-
-    if (isLogin) {
-      controller.login(
-        emailController.text.trim(),
-        passwordController.text.trim(),
-      );
-    } else {
-      controller.signUp(
-        nameController.text.trim(),
-        emailController.text.trim(),
-        passwordController.text.trim(),
-      );
-    }
-  }
-
-  void forgotPassword() {}
+  Color _card(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark
+      ? const Color(0xFF1A1D23)
+      : Colors.white;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final textColor = theme.textTheme.bodyLarge?.color;
-    final secondaryText = theme.textTheme.bodySmall?.color;
-
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: theme.scaffoldBackgroundColor,
-
       body: Column(
         children: [
           /// 🔥 HEADER
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.only(top: 60, bottom: 40),
+            padding: const EdgeInsets.only(top: 30, bottom: 30),
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -83,28 +38,26 @@ class _AuthViewState extends State<AuthView> {
                   AppColors.primary,
                   AppColors.secondaryDark,
                 ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
             ),
             child: Column(
               children: [
-                Image.asset("assets/splash.png", height: 70),
-                const SizedBox(height: 12),
-                Text(
+                Image.asset("assets/splash.png", height: 60),
+                const SizedBox(height: 10),
+                const Text(
                   "KitabMandi",
                   style: TextStyle(
-                    fontSize: 26,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(
                   "Buy • Sell • Save • Learn",
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 12,
                     color: Colors.white.withOpacity(0.8),
                   ),
                 ),
@@ -112,202 +65,252 @@ class _AuthViewState extends State<AuthView> {
             ),
           ),
 
-          /// 🔽 FORM
+          /// 📄 FORM
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    /// 💎 CARD
-                    Container(
-                      padding: const EdgeInsets.all(22),
-                      decoration: BoxDecoration(
-                        color: theme.cardColor,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: isDark
-                                ? Colors.black.withOpacity(0.4)
-                                : Colors.black.withOpacity(0.08),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          /// NAME
-                          if (!isLogin) ...[
-                            AppTextField(
-                              controller: nameController,
-                              hintText: AppStrings.name,
-                              validator: (v) =>
-                                  Validators.validateName(v ?? ""),
+            child: Obx(
+              () => SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                padding: const EdgeInsets.all(20),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      /// 💎 CARD
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: _card(context),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: isDark
+                                  ? Colors.black.withOpacity(0.4)
+                                  : Colors.black.withOpacity(0.08),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
                             ),
-                            const SizedBox(height: 16),
                           ],
-
-                          /// EMAIL
-                          AppTextField(
-                            controller: emailController,
-                            hintText: AppStrings.email,
-                            keyboardType: TextInputType.emailAddress,
-                            validator: (v) => Validators.validateEmail(v ?? ""),
-                          ),
-
-                          const SizedBox(height: 16),
-
-                          /// PASSWORD
-                          AppTextField(
-                            controller: passwordController,
-                            hintText: AppStrings.password,
-                            obscureText: obscurePassword,
-                            validator: (v) =>
-                                Validators.validatePassword(v ?? ""),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                obscurePassword
-                                    ? Icons.visibility_off_rounded
-                                    : Icons.visibility_rounded,
-                                color: theme.iconTheme.color,
+                        ),
+                        child: Column(
+                          children: [
+                            /// 👤 NAME (SIGNUP ONLY)
+                            if (!controller.isLogin.value) ...[
+                              AppTextField(
+                                controller: controller.nameController,
+                                hintText: AppStrings.name,
+                                validator: controller.validateName,
+                                prefixIcon: Row(
+                                  mainAxisSize: .min,
+                                  crossAxisAlignment: .center,
+                                  children: [
+                                    SizedBox(width: 10),
+                                    Icon(Icons.person),
+                                    SizedBox(width: 10),
+                                    Container(
+                                      height: 45,
+                                      width: 1,
+                                      color: AppColors.darkBorder,
+                                    ),
+                                    SizedBox(width: 10),
+                                  ],
+                                ),
                               ),
-                              onPressed: () {
-                                setState(() {
-                                  obscurePassword = !obscurePassword;
-                                });
-                              },
-                            ),
-                          ),
+                              const SizedBox(height: 16),
 
-                          /// FORGOT PASSWORD
-                          if (isLogin)
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton(
-                                onPressed: forgotPassword,
-                                child: Text(
-                                  "Forgot Password?",
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: theme.colorScheme.primary,
+                              /// 📱 PHONE FIELD
+                              AppTextField(
+                                controller: controller.phoneController,
+                                hintText: "Enter phone number",
+                                keyboardType: TextInputType.phone,
+                                prefixIcon: Row(
+                                  mainAxisSize: .min,
+                                  crossAxisAlignment: .center,
+                                  children: [
+                                    SizedBox(width: 10),
+                                    Icon(Icons.call),
+                                    SizedBox(width: 10),
+                                    Container(
+                                      height: 45,
+                                      width: 1,
+                                      color: AppColors.darkBorder,
+                                    ),
+                                    SizedBox(width: 10),
+                                  ],
+                                ),
+                                validator: controller.validatePhone,
+                              ),
+                              const SizedBox(height: 16),
+                            ],
+
+                            /// 📧 EMAIL
+                            AppTextField(
+                              controller: controller.emailController,
+                              hintText: AppStrings.email,
+                              keyboardType: TextInputType.emailAddress,
+                              validator: controller.validateEmail,
+                              prefixIcon: Row(
+                                mainAxisSize: .min,
+                                crossAxisAlignment: .center,
+                                children: [
+                                  SizedBox(width: 10),
+                                  Icon(Icons.email),
+                                  SizedBox(width: 10),
+                                  Container(
+                                    height: 45,
+                                    width: 1,
+                                    color: AppColors.darkBorder,
                                   ),
+                                  SizedBox(width: 10),
+                                ],
+                              ),
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            /// 🔒 PASSWORD
+                            Obx(
+                              () => AppTextField(
+                                controller: controller.passwordController,
+                                hintText: AppStrings.password,
+                                obscureText: controller.obscurePassword.value,
+                                validator: controller.validatePassword,
+                                prefixIcon: Row(
+                                  mainAxisSize: .min,
+                                  crossAxisAlignment: .center,
+                                  children: [
+                                    SizedBox(width: 10),
+                                    Icon(Icons.lock),
+                                    SizedBox(width: 10),
+                                    Container(
+                                      height: 45,
+                                      width: 1,
+                                      color: AppColors.darkBorder,
+                                    ),
+                                    SizedBox(width: 10),
+                                  ],
+                                ),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    controller.obscurePassword.value
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                  ),
+                                  onPressed: controller.togglePassword,
                                 ),
                               ),
                             ),
 
-                          const SizedBox(height: 20),
+                            /// 🔁 FORGOT PASSWORD
+                            if (controller.isLogin.value)
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
+                                  onPressed: () {},
+                                  child: const Text("Forgot Password?"),
+                                ),
+                              ),
 
-                          /// BUTTON
-                          Obx(
-                            () => AppButton(
-                              text: isLogin
+                            const SizedBox(height: 20),
+
+                            /// 🚀 BUTTON
+                            AppButton(
+                              text: controller.isLogin.value
                                   ? AppStrings.login
                                   : AppStrings.signup,
                               isLoading: controller.isLoading.value,
-                              onPressed: submit,
+                              onPressed: () {
+                                FocusScope.of(context).unfocus();
+
+                                if (_formKey.currentState!.validate()) {
+                                  controller.submit();
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 25),
+
+                      /// 🔽 DIVIDER
+                      Row(
+                        children: [
+                          Expanded(child: Divider(color: theme.dividerColor)),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            child: Text("OR"),
+                          ),
+                          Expanded(child: Divider(color: theme.dividerColor)),
+                        ],
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      /// 🌐 GOOGLE LOGIN
+                      GestureDetector(
+                        onTap: controller.signInWithGoogle,
+                        child: Container(
+                          width: double.infinity,
+                          height: 52,
+                          decoration: BoxDecoration(
+                            color: _card(context),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: theme.dividerColor),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset("assets/google.png", height: 22),
+                              const SizedBox(width: 12),
+                              Text(
+                                "Continue with Google",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: theme.textTheme.bodyLarge?.color,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 25),
+
+                      /// 🔁 TOGGLE LOGIN/SIGNUP
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            controller.isLogin.value
+                                ? "Don't have an account? "
+                                : "Already have an account? ",
+                          ),
+                          GestureDetector(
+                            onTap: controller.toggleMode,
+                            child: Text(
+                              controller.isLogin.value ? "Sign Up" : "Login",
+                              style: TextStyle(
+                                color: theme.colorScheme.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ],
                       ),
-                    ),
 
-                    const SizedBox(height: 25),
+                      const SizedBox(height: 20),
 
-                    /// DIVIDER
-                    Row(
-                      children: [
-                        Expanded(child: Divider(color: theme.dividerColor)),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Text(
-                            "OR",
-                            style: TextStyle(color: secondaryText),
-                          ),
-                        ),
-                        Expanded(child: Divider(color: theme.dividerColor)),
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    /// GOOGLE BUTTON
-                    GestureDetector(
-                      onTap: () async {
-                        await controller.signInWithGoogle();
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        height: 52,
-                        decoration: BoxDecoration(
-                          color: isDark ? theme.cardColor : Colors.white,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: theme.dividerColor),
-                          boxShadow: [
-                            BoxShadow(
-                              color: isDark
-                                  ? Colors.black.withOpacity(0.3)
-                                  : Colors.black.withOpacity(0.05),
-                              blurRadius: 10,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset("assets/google.png", height: 22),
-                            const SizedBox(width: 12),
-                            Text(
-                              "Continue with Google",
-                              style: TextStyle(
-                                color: textColor,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 15,
-                              ),
-                            ),
-                          ],
-                        ),
+                      /// 📜 TERMS
+                      Text(
+                        "By continuing, you agree to our Terms & Privacy Policy",
+                        style: TextStyle(fontSize: 12, color: theme.hintColor),
+                        textAlign: TextAlign.center,
                       ),
-                    ),
 
-                    const SizedBox(height: 25),
-
-                    /// TOGGLE
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          isLogin
-                              ? "Don't have an account? "
-                              : "Already have an account? ",
-                          style: TextStyle(color: secondaryText),
-                        ),
-                        GestureDetector(
-                          onTap: toggleMode,
-                          child: Text(
-                            isLogin ? "Sign Up" : "Login",
-                            style: TextStyle(
-                              color: theme.colorScheme.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    /// TERMS
-                    Text(
-                      "By continuing, you agree to our Terms & Privacy Policy",
-                      style: TextStyle(fontSize: 12, color: secondaryText),
-                      textAlign: TextAlign.center,
-                    ),
-
-                    const SizedBox(height: 30),
-                  ],
+                      const SizedBox(height: 30),
+                    ],
+                  ),
                 ),
               ),
             ),

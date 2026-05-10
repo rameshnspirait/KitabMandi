@@ -1,7 +1,8 @@
 class AppStrings {
   static const login = "Login";
   static const signup = "Sign Up";
-  static const email = "Email";
-  static const password = "Password";
-  static const name = "Name";
+  static const email = "Enter email";
+  static const password = "Enter password";
+  static const name = "Enter full name";
+  static const phone = "Enter phone";
 }
