@@ -6,23 +6,18 @@ import 'package:kitab_mandi/features/dashboard/widget/home_listing_card_shimmer.
 import 'package:kitab_mandi/features/dashboard/widget/home_listing_card_widget.dart';
 import 'package:kitab_mandi/features/dashboard/widget/home_location_appbar_widget.dart';
 
-class HomeView extends StatefulWidget {
-  const HomeView({super.key});
+class HomeView extends StatelessWidget {
+  HomeView({super.key});
 
-  @override
-  State<HomeView> createState() => _HomeViewState();
-}
-
-class _HomeViewState extends State<HomeView> {
   final homeCtrl = Get.put(HomeController());
 
-  @override
-  void initState() {
-    super.initState();
+  // @override
+  // void initState() {
+  //   super.initState();
 
-    // 🔥 IMPORTANT → use real-time listener
-    homeCtrl.listenListings();
-  }
+  //   // 🔥 IMPORTANT → use real-time listener
+  //   homeCtrl.listenListings();
+  // }
 
   @override
   Widget build(BuildContext context) {

@@ -8,6 +8,12 @@ class HomeController extends GetxController {
   RxList<ListingModel> listings = <ListingModel>[].obs;
   RxBool isLoading = true.obs;
 
+  @override
+  void onInit() {
+    listenListings();
+    super.onInit();
+  }
+
   ///  REAL-TIME LISTENER
   void listenListings() {
     isLoading.value = true;

@@ -31,13 +31,9 @@ class AppPages {
     GetPage(
       name: AppRoutes.dashboard,
       page: () => const DashboardView(),
-      binding: DashboardBinding(),
+      bindings: [DashboardBinding(), HomeBinding()],
     ),
-    GetPage(
-      name: AppRoutes.home,
-      page: () => HomeView(),
-      binding: HomeBinding(),
-    ),
+
     GetPage(
       name: AppRoutes.sellerlisting,
       page: () => SellerListingView(),
