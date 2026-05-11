@@ -11,6 +11,11 @@ class SellerListingView extends StatelessWidget {
 
   final controller = Get.put(SellerController());
 
+  Color _background(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return isDark ? const Color(0xFF1A1D23) : const Color(0xFFFFFFFF);
+  }
+
   Color _card(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark
       ? const Color(0xFF1A1D23)
@@ -24,9 +29,11 @@ class SellerListingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
     return Scaffold(
-      appBar: AppBar(title: const Text("Sell Your Book / Notes")),
+      appBar: AppBar(
+        title: const Text("Sell Your Book / Notes"),
+        backgroundColor: _background(context),
+      ),
       body: Obx(
         () => SingleChildScrollView(
           padding: const EdgeInsets.all(16),

@@ -13,7 +13,7 @@ class ProfileView extends StatelessWidget {
     return isDark ? const Color(0xFF1A1D23) : const Color(0xFFFFFFFF);
   }
 
-  /// 🎨 SURFACES
+  ///  SURFACES
   Color _surface(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return isDark ? const Color(0xFF1A1D23) : const Color(0xFFFFFFFF);
@@ -43,7 +43,7 @@ class ProfileView extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
-      /// 🧭 APP BAR (unchanged logic)
+      ///  APP BAR (unchanged logic)
       appBar: AppBar(
         title: Text("Profile", style: AppTextStyles.heading2(context)),
         elevation: 0,
@@ -132,7 +132,7 @@ class ProfileView extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '+91' + authCtrl.userData.value?['phone'] ?? 'NA',
+                    "${'+91' + authCtrl.userData.value?['phone']}??'NA'",
                     style: TextStyle(fontSize: 12, color: _mutedText(context)),
                   ),
                   const SizedBox(height: 2),
