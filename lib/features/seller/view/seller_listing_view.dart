@@ -253,23 +253,27 @@ class SellerListingView extends StatelessWidget {
               const SizedBox(height: 12),
 
               // ================= LOCATION =================
-              AppTextField(
-                controller: TextEditingController(text: controller.fullAddress),
-                readOnly: true,
-                hintText: "Detect Location",
-                suffixIcon: controller.isDetectingLocation.value
-                    ? const Padding(
-                        padding: EdgeInsets.all(12),
-                        child: SizedBox(
-                          height: 16,
-                          width: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+              Obx(
+                () => AppTextField(
+                  controller: TextEditingController(
+                    text: controller.fullAddress,
+                  ),
+                  readOnly: true,
+                  hintText: "Detect Location",
+                  suffixIcon: controller.isDetectingLocation.value
+                      ? const Padding(
+                          padding: EdgeInsets.all(12),
+                          child: SizedBox(
+                            height: 16,
+                            width: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        )
+                      : IconButton(
+                          icon: const Icon(Icons.my_location),
+                          onPressed: controller.detectLocation,
                         ),
-                      )
-                    : IconButton(
-                        icon: const Icon(Icons.my_location),
-                        onPressed: controller.detectLocation,
-                      ),
+                ),
               ),
 
               const SizedBox(height: 12),

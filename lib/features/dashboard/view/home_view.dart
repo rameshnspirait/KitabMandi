@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-
-import 'package:kitab_mandi/features/dashboard/data/dummy.dart';
+import 'package:get/get.dart';
+import 'package:kitab_mandi/features/dashboard/controller/home_controller.dart';
 import 'package:kitab_mandi/features/dashboard/widget/home_listing_card_shimmer.dart';
 import 'package:kitab_mandi/features/dashboard/widget/home_listing_card_widget.dart';
 import 'package:kitab_mandi/features/dashboard/widget/home_location_appbar_widget.dart';
@@ -14,7 +14,15 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  bool isLoading = false;
+  final homeCtrl = Get.put(HomeController());
+
+  @override
+  void initState() {
+    super.initState();
+
+    // 🔥 IMPORTANT → use real-time listener
+    homeCtrl.listenListings();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,28 +34,54 @@ class _HomeViewState extends State<HomeView> {
 
       body: RefreshIndicator(
         onRefresh: () async {
-          await Future.delayed(const Duration(seconds: 2));
+          await homeCtrl.fetchListings();
         },
-        child: isLoading
-            ? MasonryGridView.count(
-                crossAxisCount: 2,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                itemCount: 6,
-                itemBuilder: (_, __) => const ListingGridCardShimmer(),
-              )
-            : MasonryGridView.count(
-                crossAxisCount: 2,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                itemCount: dummyBooks.length,
-                itemBuilder: (context, index) {
-                  final book = dummyBooks[index];
-                  return ListingGridCard(book: book);
-                },
-              ),
+
+        // 🔥 MAIN FIX → OBX
+        child: Obx(() {
+          /// 🔥 LOADING STATE
+          if (homeCtrl.isLoading.value) {
+            return MasonryGridView.count(
+              crossAxisCount: 2,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              itemCount: 6,
+              itemBuilder: (_, __) => const ListingGridCardShimmer(),
+            );
+          }
+
+          /// 🔥 EMPTY STATE
+          if (homeCtrl.listings.isEmpty) {
+            return ListView(
+              children: const [
+                SizedBox(height: 150),
+                Center(
+                  child: Text(
+                    "No listings found 😔",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
+              ],
+            );
+          }
+
+          ///  DATA STATE
+          return MasonryGridView.count(
+            crossAxisCount: 2,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            itemCount: homeCtrl.listings.length,
+            itemBuilder: (context, index) {
+              final book = homeCtrl.listings[index];
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: ListingGridCard(book: book),
+              );
+            },
+          );
+        }),
       ),
     );
   }

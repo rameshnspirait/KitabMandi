@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:kitab_mandi/features/dashboard/model/book_model.dart';
+import 'package:kitab_mandi/core/utils/time_ago_utils.dart';
+import 'package:kitab_mandi/features/dashboard/model/listing_model.dart';
 import 'package:kitab_mandi/widgets/app_cached_image_network.dart';
 
 class ListingGridCard extends StatefulWidget {
-  final BookModel book;
+  final ListingModel book;
 
   const ListingGridCard({super.key, required this.book});
 
@@ -79,7 +80,7 @@ class _ListingGridCardState extends State<ListingGridCard> {
                   ),
 
                   /// BOOSTED BADGE
-                  if (widget.book.isBoosted)
+                  if (widget.book.isBoosted ?? false)
                     Positioned(
                       top: 8,
                       left: 8,
@@ -112,9 +113,34 @@ class _ListingGridCardState extends State<ListingGridCard> {
                       child: AnimatedScale(
                         scale: isFav ? 1.2 : 1.0,
                         duration: const Duration(milliseconds: 200),
-                        child: Icon(
-                          isFav ? Icons.favorite : Icons.favorite_border,
-                          color: isFav ? Colors.red : Colors.white,
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? Colors.black.withOpacity(0.5) // dark mode bg
+                                : Colors.white.withOpacity(
+                                    0.9,
+                                  ), // light mode bg
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 6,
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            isFav ? Icons.favorite : Icons.favorite_border,
+                            color: isFav
+                                ? Colors.red
+                                : Theme.of(context).brightness ==
+                                      Brightness.dark
+                                ? Colors
+                                      .white // visible on dark
+                                : Colors.black87, // visible on light
+                            size: 20,
+                          ),
                         ),
                       ),
                     ),
@@ -154,7 +180,7 @@ class _ListingGridCardState extends State<ListingGridCard> {
                   children: [
                     /// PRICE
                     Text(
-                      widget.book.price,
+                      '₹ ' + widget.book.price.toString(),
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -183,7 +209,10 @@ class _ListingGridCardState extends State<ListingGridCard> {
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            'Published By ' + widget.book.sellerName,
+                            'Published By ' +
+                                widget.book.seller['name'].toString().split(
+                                  ' ',
+                                )[0],
                             style: const TextStyle(
                               fontSize: 11,
                               color: Colors.grey,
@@ -202,7 +231,7 @@ class _ListingGridCardState extends State<ListingGridCard> {
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                            widget.book.location,
+                            getDisplayLocation(widget.book.location),
                             style: const TextStyle(
                               fontSize: 11,
                               color: Colors.grey,
@@ -210,8 +239,9 @@ class _ListingGridCardState extends State<ListingGridCard> {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
+
                         Text(
-                          widget.book.postedTime,
+                          TimeAgoUtil.timeAgo(widget.book.createdAt),
                           style: const TextStyle(
                             fontSize: 10,
                             color: Colors.grey,
@@ -227,5 +257,19 @@ class _ListingGridCardState extends State<ListingGridCard> {
         ),
       ),
     );
+  }
+
+  String getDisplayLocation(Map<String, dynamic> location) {
+    final subLocality = location['subLocality'] ?? "";
+    final locality = location['locality'] ?? "";
+    final city = location['city'] ?? "";
+
+    if (subLocality.isNotEmpty && locality.isNotEmpty) {
+      return "$subLocality, $locality";
+    } else if (locality.isNotEmpty) {
+      return locality;
+    } else {
+      return city;
+    }
   }
 }

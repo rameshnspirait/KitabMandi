@@ -2,7 +2,10 @@ import 'package:get/get.dart';
 import 'package:kitab_mandi/features/auth/binding/auth_binding.dart';
 import 'package:kitab_mandi/features/auth/view/auth_view.dart';
 import 'package:kitab_mandi/features/dashboard/binding/dashboard_binding.dart';
+import 'package:kitab_mandi/features/dashboard/binding/home_binding.dart';
+import 'package:kitab_mandi/features/dashboard/controller/home_controller.dart';
 import 'package:kitab_mandi/features/dashboard/view/dashboard_view.dart';
+import 'package:kitab_mandi/features/dashboard/view/home_view.dart';
 import 'package:kitab_mandi/features/seller/view/seller_listing_view.dart';
 import 'package:kitab_mandi/features/splash/binding/splash_binding.dart';
 import 'package:kitab_mandi/features/splash/view/splash_view.dart';
@@ -29,6 +32,11 @@ class AppPages {
       name: AppRoutes.dashboard,
       page: () => const DashboardView(),
       binding: DashboardBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.home,
+      page: () => HomeView(),
+      binding: HomeBinding(),
     ),
     GetPage(
       name: AppRoutes.sellerlisting,

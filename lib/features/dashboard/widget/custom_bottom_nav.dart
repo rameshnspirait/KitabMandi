@@ -68,7 +68,7 @@ class _CustomBottomNavState extends State<CustomBottomNav>
         alignment: Alignment.bottomCenter,
         clipBehavior: Clip.none,
         children: [
-          /// 🧭 NAV BAR CONTAINER
+          ///  NAV BAR CONTAINER
           ClipPath(
             clipper: _NavBarClipper(),
             child: Container(
@@ -140,7 +140,7 @@ class _CustomBottomNavState extends State<CustomBottomNav>
     );
   }
 
-  /// 🔹 NAV ITEM (IMPROVED PREMIUM STATE)
+  ///  NAV ITEM (IMPROVED PREMIUM STATE)
   Widget _navItem(
     IconData icon,
     String label,

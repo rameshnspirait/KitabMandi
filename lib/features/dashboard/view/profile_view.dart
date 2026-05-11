@@ -132,7 +132,7 @@ class ProfileView extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    "${'+91' + authCtrl.userData.value?['phone']}??'NA'",
+                    "${'+91' + authCtrl.userData.value?['phone']}",
                     style: TextStyle(fontSize: 12, color: _mutedText(context)),
                   ),
                   const SizedBox(height: 2),

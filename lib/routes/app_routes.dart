@@ -5,5 +5,6 @@ class AppRoutes {
   static const auth = '/auth';
   //  Main
   static const dashboard = '/dashboard';
+  static const home = '/home';
   static const sellerlisting = '/sellerlisting';
 }

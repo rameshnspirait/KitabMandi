@@ -27,8 +27,8 @@ class AuthView extends StatelessWidget {
         const SizedBox(width: 10),
         Container(
           height: 45,
-          width: 1,
-          color: theme.dividerColor, // ✅ DARK/LIGHT SAFE
+          width: 0.5,
+          color: theme.dividerColor, //  DARK/LIGHT SAFE
         ),
         const SizedBox(width: 10),
       ],
