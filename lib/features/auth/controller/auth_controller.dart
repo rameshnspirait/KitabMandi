@@ -23,11 +23,18 @@ class AuthController extends GetxController {
   var obscurePassword = true.obs;
   var isGoogleUser = false.obs; // ✅ IMPORTANT
 
-  /// 🔹 CONTROLLERS
+  ///  CONTROLLERS
   final nameController = TextEditingController();
   final phoneController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  Rxn<Map<String, dynamic>> userData = Rxn<Map<String, dynamic>>();
+
+  @override
+  void onInit() {
+    fetchUserData();
+    super.onInit();
+  }
 
   /// ================= TOGGLE =================
   void toggleMode() {
@@ -59,6 +66,23 @@ class AuthController extends GetxController {
     return null;
   }
 
+  //===============FETCH CURRENT USERS DETAILS=============
+  Future<void> fetchUserData() async {
+    try {
+      final user = _auth.currentUser;
+
+      if (user == null) return;
+
+      final doc = await _firestore.collection('users').doc(user.uid).get();
+
+      if (doc.exists) {
+        userData.value = doc.data();
+      }
+    } catch (e) {
+      debugPrint("Fetch user error: $e");
+    }
+  }
+
   /// ================= SUBMIT =================
   Future<void> submit() async {
     FocusManager.instance.primaryFocus?.unfocus();
@@ -68,28 +92,48 @@ class AuthController extends GetxController {
     } else {
       await signUp();
     }
+
+    await fetchUserData();
   }
 
   /// ================= SIGNUP =================
   Future<void> signUp() async {
     final name = nameController.text.trim();
     final phone = phoneController.text.trim();
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
 
     final nameError = validateName(name);
     final phoneError = validatePhone(phone);
+    final emailError = validateEmail(email);
+    final passError = isGoogleUser.value ? null : validatePassword(password);
 
     if (nameError != null) return AppSnackbar.error(nameError);
     if (phoneError != null) return AppSnackbar.error(phoneError);
+    if (emailError != null) return AppSnackbar.error(emailError);
+    if (passError != null) return AppSnackbar.error(passError);
 
     try {
       isLoading.value = true;
 
-      final user = _auth.currentUser;
+      User? user = _auth.currentUser;
 
-      if (user == null) {
-        return AppSnackbar.error("User not authenticated");
+      /// 🔥 STEP 1: CREATE USER IF EMAIL SIGNUP
+      if (!isGoogleUser.value) {
+        final cred = await _auth.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+
+        user = cred.user;
       }
 
+      /// 🔴 SAFETY CHECK
+      if (user == null) {
+        return AppSnackbar.error("User creation failed");
+      }
+
+      /// 🔥 STEP 2: SAVE TO FIRESTORE
       await _firestore.collection('users').doc(user.uid).set({
         "uid": user.uid,
         "name": name,
@@ -100,15 +144,15 @@ class AuthController extends GetxController {
         "createdAt": FieldValue.serverTimestamp(),
       });
 
-      AppSnackbar.success("Account setup completed 🚀");
-
+      if (isGoogleUser.value) {
+        AppSnackbar.success("Account setup completed 🚀");
+      }
       clearFields();
       isLogin.value = true;
       isGoogleUser.value = false;
-
       Get.offAllNamed(AppRoutes.wrapper);
     } catch (e) {
-      AppSnackbar.error("Signup failed. Try again.");
+      AppSnackbar.error("Signup failed. ${e.toString()}");
     } finally {
       isLoading.value = false;
     }

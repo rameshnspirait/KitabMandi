@@ -13,12 +13,12 @@ class WrapperView extends StatelessWidget {
       body: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
-          /// 🔄 LOADING
+          ///  LOADING
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          /// ❌ NOT LOGGED IN
+          ///  NOT LOGGED IN
           if (!snapshot.hasData) {
             return AuthView();
           }
@@ -40,14 +40,14 @@ class WrapperView extends StatelessWidget {
               /// 📄 DATA
               final data = snap.data?.data() as Map<String, dynamic>?;
 
-              /// ❗ PROFILE NOT COMPLETE
+              ///  PROFILE NOT COMPLETE
               if (data == null ||
                   data["phone"] == null ||
                   data["phone"].toString().isEmpty) {
                 return AuthView(); // 🔥 stay on auth
               }
 
-              /// ✅ PROFILE COMPLETE
+              ///  PROFILE COMPLETE
               return const DashboardView();
             },
           );

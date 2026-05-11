@@ -7,6 +7,7 @@ import 'package:kitab_mandi/widgets/app_button.dart';
 
 class ProfileView extends StatelessWidget {
   ProfileView({super.key});
+  final authCtrl = Get.find<AuthController>();
   Color _background(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return isDark ? const Color(0xFF1A1D23) : const Color(0xFFFFFFFF);
@@ -35,7 +36,6 @@ class ProfileView extends StatelessWidget {
     );
   }
 
-  final authCtrl = Get.find<AuthController>();
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<ThemeController>();
@@ -54,7 +54,7 @@ class ProfileView extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            _buildProfileHeader(context),
+            _buildProfileHeader(context, authCtrl),
             const SizedBox(height: 14),
 
             _buildStats(context),
@@ -98,7 +98,7 @@ class ProfileView extends StatelessWidget {
   }
 
   ///  PROFILE HEADER (clean + modern)
-  Widget _buildProfileHeader(BuildContext context) {
+  Widget _buildProfileHeader(BuildContext context, AuthController ctrl) {
     final theme = Theme.of(context);
 
     return Container(
@@ -122,16 +122,26 @@ class ProfileView extends StatelessWidget {
           const SizedBox(width: 12),
 
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Ramesh", style: AppTextStyles.title(context)),
-                const SizedBox(height: 2),
-                Text(
-                  "ramesh@email.com",
-                  style: TextStyle(fontSize: 12, color: _mutedText(context)),
-                ),
-              ],
+            child: Obx(
+              () => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    authCtrl.userData.value?['name'] ?? 'NA',
+                    style: AppTextStyles.title(context),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '+91' + authCtrl.userData.value?['phone'] ?? 'NA',
+                    style: TextStyle(fontSize: 12, color: _mutedText(context)),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    authCtrl.userData.value?['email'] ?? 'NA',
+                    style: TextStyle(fontSize: 12, color: _mutedText(context)),
+                  ),
+                ],
+              ),
             ),
           ),
 

@@ -46,7 +46,7 @@ class AuthView extends StatelessWidget {
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Column(
         children: [
-          /// 🔥 HEADER
+          ///  HEADER
           Container(
             width: double.infinity,
             padding: const EdgeInsets.only(top: 30, bottom: 30),
@@ -113,7 +113,7 @@ class AuthView extends StatelessWidget {
                         ),
                         child: Column(
                           children: [
-                            /// 👤 NAME (SIGNUP)
+                            ///  NAME (SIGNUP)
                             if (!controller.isLogin.value) ...[
                               AppTextField(
                                 controller: controller.nameController,
@@ -134,7 +134,7 @@ class AuthView extends StatelessWidget {
                               const SizedBox(height: 16),
                             ],
 
-                            /// 📧 EMAIL
+                            ///  EMAIL
                             AppTextField(
                               controller: controller.emailController,
                               hintText: AppStrings.email,
@@ -187,7 +187,7 @@ class AuthView extends StatelessWidget {
                               text: controller.isLogin.value
                                   ? AppStrings.login
                                   : controller.isGoogleUser.value
-                                  ? "Update Profile"
+                                  ? "Continue"
                                   : AppStrings.signup,
                               isLoading: controller.isLoading.value,
                               onPressed: () {
