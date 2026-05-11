@@ -17,11 +17,12 @@ class AuthController extends GetxController {
         "136794753205-210rggct227ahdu5t70ckn30rejonctk.apps.googleusercontent.com",
   );
 
-  /// 🔹 UI STATE
+  ///  UI STATE
   var isLoading = false.obs;
   var isLogin = true.obs;
   var obscurePassword = true.obs;
   var isGoogleUser = false.obs; // ✅ IMPORTANT
+  final formKey = GlobalKey<FormState>();
 
   ///  CONTROLLERS
   final nameController = TextEditingController();
@@ -39,8 +40,12 @@ class AuthController extends GetxController {
   /// ================= TOGGLE =================
   void toggleMode() {
     isLogin.toggle();
-    isGoogleUser.value = false; // reset
+    isGoogleUser.value = false;
+
     clearFields();
+
+    // ✅ RESET FORM STATE (VERY IMPORTANT)
+    formKey.currentState?.reset();
   }
 
   void togglePassword() {
@@ -87,6 +92,8 @@ class AuthController extends GetxController {
   Future<void> submit() async {
     FocusManager.instance.primaryFocus?.unfocus();
 
+    if (!formKey.currentState!.validate()) return;
+
     if (isLogin.value) {
       await login();
     } else {
@@ -118,7 +125,7 @@ class AuthController extends GetxController {
 
       User? user = _auth.currentUser;
 
-      /// 🔥 STEP 1: CREATE USER IF EMAIL SIGNUP
+      ///  STEP 1: CREATE USER IF EMAIL SIGNUP
       if (!isGoogleUser.value) {
         final cred = await _auth.createUserWithEmailAndPassword(
           email: email,
@@ -128,12 +135,12 @@ class AuthController extends GetxController {
         user = cred.user;
       }
 
-      /// 🔴 SAFETY CHECK
+      ///  SAFETY CHECK
       if (user == null) {
         return AppSnackbar.error("User creation failed");
       }
 
-      /// 🔥 STEP 2: SAVE TO FIRESTORE
+      ///  STEP 2: SAVE TO FIRESTORE
       await _firestore.collection('users').doc(user.uid).set({
         "uid": user.uid,
         "name": name,
@@ -214,7 +221,7 @@ class AuthController extends GetxController {
       final docRef = _firestore.collection("users").doc(user.uid);
       final doc = await docRef.get();
 
-      /// ✅ EXISTING USER → HOME
+      ///  EXISTING USER → HOME
       if (doc.exists) {
         final data = doc.data();
 

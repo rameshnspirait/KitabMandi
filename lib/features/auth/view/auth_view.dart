@@ -10,7 +10,6 @@ class AuthView extends StatelessWidget {
   AuthView({super.key});
 
   final AuthController controller = Get.find<AuthController>();
-  final _formKey = GlobalKey<FormState>();
 
   Color _card(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark
@@ -92,7 +91,7 @@ class AuthView extends StatelessWidget {
                     ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.all(20),
                 child: Form(
-                  key: _formKey,
+                  key: controller.formKey,
                   child: Column(
                     children: [
                       /// 💎 CARD
@@ -193,7 +192,8 @@ class AuthView extends StatelessWidget {
                               onPressed: () {
                                 FocusScope.of(context).unfocus();
 
-                                if (_formKey.currentState!.validate()) {
+                                if (controller.formKey.currentState!
+                                    .validate()) {
                                   controller.submit();
                                 }
                               },
