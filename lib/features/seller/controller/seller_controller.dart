@@ -113,6 +113,7 @@ class SellerController extends GetxController {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
+      _compressImage(File(image.path));
       images.add(image.path);
     }
   }

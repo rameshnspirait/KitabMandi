@@ -11,14 +11,6 @@ class HomeView extends StatelessWidget {
 
   final homeCtrl = Get.put(HomeController());
 
-  // @override
-  // void initState() {
-  //   super.initState();
-
-  //   // 🔥 IMPORTANT → use real-time listener
-  //   homeCtrl.listenListings();
-  // }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
