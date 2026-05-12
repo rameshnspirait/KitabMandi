@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:kitab_mandi/core/constants/app_color.dart';
 import 'package:kitab_mandi/core/constants/app_string.dart';
 import 'package:kitab_mandi/features/auth/controller/auth_controller.dart';
+import 'package:kitab_mandi/routes/app_routes.dart';
 import 'package:kitab_mandi/widgets/app_button.dart';
 import 'package:kitab_mandi/widgets/app_text_field.dart';
 
@@ -94,7 +95,7 @@ class AuthView extends StatelessWidget {
                   key: controller.formKey,
                   child: Column(
                     children: [
-                      /// 💎 CARD
+                      ///  CARD
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
@@ -122,7 +123,7 @@ class AuthView extends StatelessWidget {
                               ),
                               const SizedBox(height: 16),
 
-                              /// 📱 PHONE
+                              ///  PHONE
                               AppTextField(
                                 controller: controller.phoneController,
                                 hintText: "Enter phone number",
@@ -148,7 +149,7 @@ class AuthView extends StatelessWidget {
 
                             const SizedBox(height: 16),
 
-                            /// 🔒 PASSWORD (HIDE FOR GOOGLE USER)
+                            ///  PASSWORD (HIDE FOR GOOGLE USER)
                             if (!controller.isGoogleUser.value)
                               Obx(
                                 () => AppTextField(
@@ -168,20 +169,23 @@ class AuthView extends StatelessWidget {
                                 ),
                               ),
 
-                            /// 🔁 FORGOT PASSWORD
+                            ///  FORGOT PASSWORD
                             if (controller.isLogin.value &&
                                 !controller.isGoogleUser.value)
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: TextButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    controller.clearAllFields();
+                                    Get.toNamed(AppRoutes.forgotPassword);
+                                  },
                                   child: const Text("Forgot Password?"),
                                 ),
                               ),
 
                             const SizedBox(height: 20),
 
-                            /// 🚀 BUTTON
+                            ///  BUTTON
                             AppButton(
                               text: controller.isLogin.value
                                   ? AppStrings.login
@@ -204,7 +208,7 @@ class AuthView extends StatelessWidget {
 
                       const SizedBox(height: 25),
 
-                      /// 🔽 DIVIDER
+                      ///  DIVIDER
                       Row(
                         children: [
                           Expanded(child: Divider(color: theme.dividerColor)),

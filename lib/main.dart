@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
         //  DYNAMIC THEME (FIXED)
         themeMode: controller.themeMode.value,
 
-        // 🚀 ROUTING
+        //  ROUTING
         initialRoute: AppRoutes.splash,
         initialBinding: InitialBinding(),
         getPages: AppPages.routes,

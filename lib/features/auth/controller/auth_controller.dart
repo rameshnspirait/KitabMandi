@@ -29,10 +29,11 @@ class AuthController extends GetxController {
   final nameController = TextEditingController();
   final phoneController = TextEditingController();
   final emailController = TextEditingController();
+  final forgotEmailController = TextEditingController();
   final passwordController = TextEditingController();
+
   Rxn<Map<String, dynamic>> userData = Rxn<Map<String, dynamic>>();
 
-  ///  FLAG TO PREVENT DUPLICATE SNACKBAR
   bool _isManualLogin = false;
 
   @override
@@ -41,13 +42,12 @@ class AuthController extends GetxController {
     _listenAuthChanges();
   }
 
-  ///  AUTH STATE LISTENER (SINGLE SOURCE OF TRUTH)
+  /// ================= AUTH LISTENER =================
   void _listenAuthChanges() {
     _auth.authStateChanges().listen((user) async {
       if (user != null) {
         await fetchUserData();
 
-        ///  Show snackbar ONLY once
         if (_isManualLogin) {
           AppSnackbar.success("Login successful 🎉");
           _isManualLogin = false;
@@ -62,40 +62,53 @@ class AuthController extends GetxController {
   Future<void> fetchUserData() async {
     try {
       final user = _auth.currentUser;
-
       if (user == null) return;
 
       final doc = await _firestore.collection('users').doc(user.uid).get();
 
       if (doc.exists) {
         userData.value = doc.data();
-        debugPrint(" User Data Loaded: ${userData.value}");
-      } else {
-        debugPrint(" User doc not found");
       }
     } catch (e) {
-      debugPrint(" Fetch user error: $e");
+      debugPrint("Fetch user error: $e");
     }
+  }
+
+  /// ================= CLEAR HELPERS =================
+  void clearAllFields() {
+    nameController.clear();
+    phoneController.clear();
+    emailController.clear();
+    forgotEmailController.clear();
+    passwordController.clear();
+  }
+
+  void clearLoginFields() {
+    emailController.clear();
+    passwordController.clear();
+  }
+
+  void clearSignupFields() {
+    nameController.clear();
+    phoneController.clear();
+    emailController.clear();
+    forgotEmailController.clear();
+    passwordController.clear();
+  }
+
+  void clearForgotFields() {
+    emailController.clear();
   }
 
   /// ================= TOGGLE =================
   void toggleMode() {
     isLogin.toggle();
     isGoogleUser.value = false;
-    clearFields();
+    clearAllFields();
     formKey.currentState?.reset();
   }
 
-  void togglePassword() {
-    obscurePassword.toggle();
-  }
-
-  void clearFields() {
-    nameController.clear();
-    phoneController.clear();
-    emailController.clear();
-    passwordController.clear();
-  }
+  void togglePassword() => obscurePassword.toggle();
 
   /// ================= VALIDATORS =================
   String? validateName(String? v) => Validators.validateName(v ?? "");
@@ -159,18 +172,55 @@ class AuthController extends GetxController {
 
       await fetchUserData();
 
-      ///  Only for signup (no duplication issue here)
       AppSnackbar.success("Signup successful 🚀");
 
-      clearFields();
+      clearSignupFields();
+
       isLogin.value = true;
       isGoogleUser.value = false;
 
       Get.offAllNamed(AppRoutes.wrapper);
+    } on FirebaseAuthException catch (e) {
+      AppSnackbar.error(_handleAuthError(e));
     } catch (e) {
-      AppSnackbar.error("Signup failed: $e");
+      AppSnackbar.error("Signup failed");
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  /// ================= FORGOT PASSWORD =================
+  Future<void> forgotPassword() async {
+    try {
+      isLoading.value = true;
+
+      final email = forgotEmailController.text.trim();
+
+      if (email.isEmpty) {
+        isLoading.value = false; // ✅ FIX
+        AppSnackbar.error("Email is required");
+        return;
+      }
+
+      if (!GetUtils.isEmail(email)) {
+        isLoading.value = false; // ✅ FIX
+        AppSnackbar.error("Enter a valid email");
+        return;
+      }
+
+      await _auth.sendPasswordResetEmail(email: email);
+
+      //  SUCCESS FLOW
+
+      clearForgotFields();
+      Get.back(result: true); // ✅ go back
+      AppSnackbar.success("Password reset link sent 📩");
+    } on FirebaseAuthException catch (e) {
+      AppSnackbar.error(_handleAuthError(e));
+    } catch (e) {
+      AppSnackbar.error("Something went wrong");
+    } finally {
+      isLoading.value = false; // ✅ always reset
     }
   }
 
@@ -179,12 +229,14 @@ class AuthController extends GetxController {
     try {
       isLoading.value = true;
 
-      _isManualLogin = true; // 🔥 CONTROL FLAG
+      _isManualLogin = true;
 
       await _auth.signInWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
+
+      clearLoginFields();
 
       Get.offAllNamed(AppRoutes.wrapper);
     } on FirebaseAuthException catch (e) {
@@ -208,6 +260,7 @@ class AuthController extends GetxController {
       final googleUser = await _googleSignIn.signIn();
 
       if (googleUser == null) {
+        isLoading.value = false;
         AppSnackbar.error("Cancelled");
         return;
       }
@@ -219,8 +272,6 @@ class AuthController extends GetxController {
         accessToken: googleAuth.accessToken,
       );
 
-      _isManualLogin = true; // 🔥 SAME FIX
-
       final userCred = await _auth.signInWithCredential(credential);
       final user = userCred.user;
 
@@ -228,23 +279,27 @@ class AuthController extends GetxController {
 
       final doc = await _firestore.collection("users").doc(user.uid).get();
 
-      if (doc.exists && doc.data()?["phone"] != "") {
+      // ✅ EXISTING USER
+      if (doc.exists && (doc.data()?["phone"] ?? "").toString().isNotEmpty) {
+        clearAllFields();
+
+        AppSnackbar.success("Login successful ✅"); //  ONLY HERE
+
         Get.offAllNamed(AppRoutes.wrapper);
         return;
       }
 
-      /// NEW USER FLOW
-      _isManualLogin = false;
-
+      // ✅ NEW USER FLOW
       isGoogleUser.value = true;
       isLogin.value = false;
 
       nameController.text = user.displayName ?? "";
       emailController.text = user.email ?? "";
 
-      AppSnackbar.success("Complete your profile");
+      AppSnackbar.success("Complete your profile ✍️"); // ✅ ONLY THIS
+    } on FirebaseAuthException catch (e) {
+      AppSnackbar.error(_handleAuthError(e));
     } catch (e) {
-      _isManualLogin = false;
       AppSnackbar.error("Google login failed");
     } finally {
       isLoading.value = false;
@@ -262,13 +317,15 @@ class AuthController extends GetxController {
 
       await Hive.close();
 
-      Get.deleteAll(); // ✅ keep this
+      clearAllFields();
+
+      Get.deleteAll();
     } catch (e) {
       debugPrint("Logout Error: $e");
     }
   }
 
-  /// ================= LOGOUT DIALOG =================
+  //===================LOGOUT DIALOG==============
   void showLogoutDialog(BuildContext context) {
     final theme = Theme.of(context);
 
@@ -281,21 +338,44 @@ class AuthController extends GetxController {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.logout, size: 30, color: theme.colorScheme.primary),
+              /// 🔴 ICON
+              Icon(Icons.logout, size: 32, color: theme.colorScheme.primary),
+
               const SizedBox(height: 12),
-              Text("Logout?", style: theme.textTheme.titleLarge),
+
+              /// TITLE
+              Text(
+                "Logout?",
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
               const SizedBox(height: 8),
-              const Text("Are you sure you want to logout?"),
+
+              /// SUBTITLE
+              Text(
+                "Are you sure you want to logout?",
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium,
+              ),
+
               const SizedBox(height: 20),
+
+              /// BUTTONS
               Row(
                 children: [
+                  /// CANCEL
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => Get.back(),
                       child: const Text("Cancel"),
                     ),
                   ),
+
                   const SizedBox(width: 10),
+
+                  /// LOGOUT
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
@@ -314,21 +394,29 @@ class AuthController extends GetxController {
     );
   }
 
-  /// ================= ERROR =================
+  /// ================= ERROR HANDLER =================
   String _handleAuthError(FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':
-        return "User not found";
+        return "No account found with this email";
       case 'wrong-password':
-        return "Wrong password";
+        return "Incorrect password";
+      case 'invalid-credential':
+        return "Invalid email or password";
+      case 'user-disabled':
+        return "This account has been disabled";
       case 'email-already-in-use':
-        return "Email already exists";
+        return "Email is already registered";
       case 'invalid-email':
-        return "Invalid email";
+        return "Invalid email format";
       case 'weak-password':
-        return "Weak password";
+        return "Password must be at least 6 characters";
+      case 'network-request-failed':
+        return "No internet connection";
+      case 'too-many-requests':
+        return "Too many attempts. Try again later";
       default:
-        return e.message ?? "Authentication failed";
+        return e.message ?? "Something went wrong";
     }
   }
 }
