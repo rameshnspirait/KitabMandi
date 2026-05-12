@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:get/state_manager.dart';
-import 'package:kitab_mandi/features/dashboard/view/wishlist_view.dart';
+import 'package:kitab_mandi/features/dashboard/view/my_ads_view.dart';
+import 'package:kitab_mandi/features/wishlist/view/wishlist_view.dart';
 import 'package:kitab_mandi/features/dashboard/view/home_view.dart';
 import 'package:kitab_mandi/features/dashboard/view/profile_view.dart';
 import 'package:kitab_mandi/features/dashboard/view/chat_view.dart';
@@ -18,7 +19,7 @@ class DashboardView extends StatefulWidget {
 class _DashboardViewState extends State<DashboardView> {
   int currentIndex = 0;
 
-  final pages = [HomeView(), ChatView(), WishlistView(), ProfileView()];
+  final pages = [HomeView(), ChatView(), MyAdsView(), ProfileView()];
 
   void onTabChange(int index) {
     setState(() {

@@ -64,12 +64,6 @@ class WishlistController extends GetxController {
           .collection('wishlist')
           .doc(listingId)
           .set({...item, "createdAt": FieldValue.serverTimestamp()});
-
-      Get.snackbar(
-        "Success",
-        "Added to wishlist ❤️",
-        snackPosition: SnackPosition.BOTTOM,
-      );
     } catch (e) {
       debugPrint("Add wishlist error: $e");
     }
@@ -86,12 +80,6 @@ class WishlistController extends GetxController {
           .collection('wishlist')
           .doc(listingId)
           .delete();
-
-      Get.snackbar(
-        "Removed",
-        "Removed from wishlist",
-        snackPosition: SnackPosition.BOTTOM,
-      );
     } catch (e) {
       debugPrint("Remove wishlist error: $e");
     }

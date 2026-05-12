@@ -99,7 +99,7 @@ class _CustomBottomNavState extends State<CustomBottomNav>
 
                   const SizedBox(width: 60),
 
-                  _navItem(Icons.favorite_border, 'Wishlist', 2, context),
+                  _navItem(Icons.inventory_2_outlined, 'My Ads', 2, context),
                   _navItem(Icons.person, 'Profile', 3, context),
                 ],
               ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kitab_mandi/core/utils/time_ago_utils.dart';
-import 'package:kitab_mandi/features/dashboard/controller/wishlist_controller.dart';
+import 'package:kitab_mandi/features/wishlist/controller/wishlist_controller.dart';
 import 'package:kitab_mandi/features/dashboard/model/listing_model.dart';
 import 'package:kitab_mandi/widgets/app_cached_image_network.dart';
 
@@ -17,7 +17,7 @@ class ListingGridCard extends StatefulWidget {
 class _ListingGridCardState extends State<ListingGridCard> {
   bool isFav = false;
   int currentImage = 0;
-  final wishlistController = Get.find<WishlistController>();
+  final wishlistController = Get.put(WishlistController());
 
   Color _surface(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:kitab_mandi/core/constants/app_text_style.dart';
 import 'package:kitab_mandi/core/controller/theme_controller.dart';
 import 'package:kitab_mandi/features/auth/controller/auth_controller.dart';
+import 'package:kitab_mandi/routes/app_routes.dart';
 import 'package:kitab_mandi/widgets/app_button.dart';
 
 class ProfileView extends StatelessWidget {
@@ -60,7 +61,7 @@ class ProfileView extends StatelessWidget {
             _buildStats(context),
             const SizedBox(height: 14),
 
-            _buildQuickActions(context),
+            // _buildQuickActions(context),
             const SizedBox(height: 14),
 
             Obx(() => _themeSwitch(context, controller)),
@@ -70,9 +71,11 @@ class ProfileView extends StatelessWidget {
               context,
               title: "Account",
               children: [
-                _tile(context, Icons.book_outlined, "My Listings"),
-                _tile(context, Icons.shopping_bag_outlined, "My Orders"),
-                _tile(context, Icons.favorite_border, "Wishlist"),
+                _tile(context, Icons.book_outlined, "My Listings", () {}),
+                _tile(context, Icons.shopping_bag_outlined, "My Orders", () {}),
+                _tile(context, Icons.favorite_border, "Wishlist", () {
+                  Get.toNamed(AppRoutes.wishlist);
+                }),
               ],
             ),
 
@@ -82,9 +85,14 @@ class ProfileView extends StatelessWidget {
               context,
               title: "Support",
               children: [
-                _tile(context, Icons.help_outline, "Help Center"),
-                _tile(context, Icons.policy_outlined, "Terms & Policies"),
-                _tile(context, Icons.info_outline, "About App"),
+                _tile(context, Icons.help_outline, "Help Center", () {}),
+                _tile(
+                  context,
+                  Icons.policy_outlined,
+                  "Terms & Policies",
+                  () {},
+                ),
+                _tile(context, Icons.info_outline, "About App", () {}),
               ],
             ),
 
@@ -188,36 +196,36 @@ class ProfileView extends StatelessWidget {
   }
 
   /// ⚡ QUICK ACTIONS (modern chip-style feel)
-  Widget _buildQuickActions(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _action(context, Icons.add_circle_outline, "Sell"),
-        _action(context, Icons.list_alt_outlined, "Ads"),
-        _action(context, Icons.favorite_border, "Wishlist"),
-        _action(context, Icons.chat_bubble_outline, "Chat"),
-      ],
-    );
-  }
+  // Widget _buildQuickActions(BuildContext context) {
+  //   return Row(
+  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //     children: [
+  //       _action(context, Icons.add_circle_outline, "Sell"),
+  //       _action(context, Icons.list_alt_outlined, "Ads"),
+  //       _action(context, Icons.favorite_border, "Wishlist"),
+  //       _action(context, Icons.chat_bubble_outline, "Chat"),
+  //     ],
+  //   );
+  // }
 
-  Widget _action(BuildContext context, IconData icon, String label) {
-    final theme = Theme.of(context);
+  // Widget _action(BuildContext context, IconData icon, String label) {
+  //   final theme = Theme.of(context);
 
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.primary.withOpacity(0.10),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, size: 20, color: theme.colorScheme.primary),
-        ),
-        const SizedBox(height: 6),
-        Text(label, style: AppTextStyles.caption(context)),
-      ],
-    );
-  }
+  //   return Column(
+  //     children: [
+  //       Container(
+  //         padding: const EdgeInsets.all(10),
+  //         decoration: BoxDecoration(
+  //           color: theme.colorScheme.primary.withOpacity(0.10),
+  //           shape: BoxShape.circle,
+  //         ),
+  //         child: Icon(icon, size: 20, color: theme.colorScheme.primary),
+  //       ),
+  //       const SizedBox(height: 6),
+  //       Text(label, style: AppTextStyles.caption(context)),
+  //     ],
+  //   );
+  // }
 
   /// 🌗 THEME SWITCH (clean surface)
   Widget _themeSwitch(BuildContext context, ThemeController controller) {
@@ -262,7 +270,12 @@ class ProfileView extends StatelessWidget {
   }
 
   /// 🔹 TILE (clean modern list item)
-  Widget _tile(BuildContext context, IconData icon, String title) {
+  Widget _tile(
+    BuildContext context,
+    IconData icon,
+    String title,
+    Function()? onTap,
+  ) {
     final theme = Theme.of(context);
 
     return ListTile(
@@ -275,7 +288,7 @@ class ProfileView extends StatelessWidget {
         size: 12,
         color: theme.iconTheme.color?.withOpacity(0.5),
       ),
-      onTap: () {},
+      onTap: onTap,
     );
   }
 
