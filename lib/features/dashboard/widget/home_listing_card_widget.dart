@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:kitab_mandi/core/utils/time_ago_utils.dart';
+import 'package:kitab_mandi/features/dashboard/controller/wishlist_controller.dart';
 import 'package:kitab_mandi/features/dashboard/model/listing_model.dart';
 import 'package:kitab_mandi/widgets/app_cached_image_network.dart';
 
@@ -15,14 +17,11 @@ class ListingGridCard extends StatefulWidget {
 class _ListingGridCardState extends State<ListingGridCard> {
   bool isFav = false;
   int currentImage = 0;
+  final wishlistController = Get.find<WishlistController>();
 
   Color _surface(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return isDark ? const Color(0xFF1A1D23) : Colors.white;
-  }
-
-  void _toggleFav() {
-    setState(() => isFav = !isFav);
   }
 
   @override
@@ -109,40 +108,46 @@ class _ListingGridCardState extends State<ListingGridCard> {
                     top: 8,
                     right: 8,
                     child: GestureDetector(
-                      onTap: _toggleFav,
-                      child: AnimatedScale(
-                        scale: isFav ? 1.2 : 1.0,
-                        duration: const Duration(milliseconds: 200),
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                ? Colors.black.withOpacity(0.5) // dark mode bg
-                                : Colors.white.withOpacity(
-                                    0.9,
-                                  ), // light mode bg
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                blurRadius: 6,
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            isFav ? Icons.favorite : Icons.favorite_border,
-                            color: isFav
-                                ? Colors.red
-                                : Theme.of(context).brightness ==
+                      onTap: () {
+                        wishlistController.toggleWishlist(widget.book.toMap());
+                      },
+                      child: Obx(() {
+                        final isFav = wishlistController.isFavorite(
+                          widget.book.id,
+                        );
+
+                        return AnimatedScale(
+                          scale: isFav ? 1.2 : 1.0,
+                          duration: const Duration(milliseconds: 200),
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color:
+                                  Theme.of(context).brightness ==
                                       Brightness.dark
-                                ? Colors
-                                      .white // visible on dark
-                                : Colors.black87, // visible on light
-                            size: 20,
+                                  ? Colors.black.withOpacity(0.5)
+                                  : Colors.white.withOpacity(0.9),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  blurRadius: 6,
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              isFav ? Icons.favorite : Icons.favorite_border,
+                              color: isFav
+                                  ? Colors.red
+                                  : Theme.of(context).brightness ==
+                                        Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black87,
+                              size: 20,
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                      }),
                     ),
                   ),
 

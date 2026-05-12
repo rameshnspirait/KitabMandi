@@ -24,9 +24,9 @@ class HomeView extends StatelessWidget {
           await homeCtrl.fetchListings();
         },
 
-        // 🔥 MAIN FIX → OBX
+        //  MAIN FIX → OBX
         child: Obx(() {
-          /// 🔥 LOADING STATE
+          ///  LOADING STATE
           if (homeCtrl.isLoading.value) {
             return MasonryGridView.count(
               crossAxisCount: 2,
@@ -38,18 +38,28 @@ class HomeView extends StatelessWidget {
             );
           }
 
-          /// 🔥 EMPTY STATE
+          ///  EMPTY STATE
           if (homeCtrl.listings.isEmpty) {
-            return ListView(
-              children: const [
-                SizedBox(height: 150),
-                Center(
-                  child: Text(
-                    "No listings found 😔",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-              ],
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                return ListView(
+                  physics: const AlwaysScrollableScrollPhysics(), // ✅ required
+                  children: [
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight:
+                            constraints.maxHeight, // 👈 full screen height
+                      ),
+                      child: const Center(
+                        child: Text(
+                          "No listings found 😔",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
             );
           }
 

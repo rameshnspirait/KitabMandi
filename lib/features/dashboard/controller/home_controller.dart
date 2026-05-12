@@ -6,6 +6,7 @@ class HomeController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   RxList<ListingModel> listings = <ListingModel>[].obs;
+
   RxBool isLoading = true.obs;
 
   @override
