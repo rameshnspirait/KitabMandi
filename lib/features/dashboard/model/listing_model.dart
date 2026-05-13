@@ -10,6 +10,7 @@ class ListingModel {
   final String condition;
   final List<String> images;
   final bool? isBoosted;
+  final bool? isSold;
 
   final Map<String, dynamic> location;
   final Map<String, dynamic> seller;
@@ -33,6 +34,7 @@ class ListingModel {
     this.createdAt,
     this.updatedAt,
     this.isBoosted,
+    this.isSold,
   });
 
   /// 🔥 FROM FIRESTORE
@@ -57,6 +59,7 @@ class ListingModel {
           ? (map['updatedAt'] as dynamic).toDate()
           : null,
       isBoosted: map['isBoosted'] ?? false,
+      isSold: map['isSold'] ?? false,
     );
   }
 
@@ -78,6 +81,7 @@ class ListingModel {
       "createdAt": createdAt,
       "updatedAt": updatedAt,
       "isBoosted": isBoosted,
+      "isSold": isSold,
     };
   }
 }

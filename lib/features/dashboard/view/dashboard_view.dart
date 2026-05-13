@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
-import 'package:get/state_manager.dart';
 import 'package:kitab_mandi/features/dashboard/view/my_ads_view.dart';
-import 'package:kitab_mandi/features/wishlist/view/wishlist_view.dart';
 import 'package:kitab_mandi/features/dashboard/view/home_view.dart';
 import 'package:kitab_mandi/features/dashboard/view/profile_view.dart';
 import 'package:kitab_mandi/features/dashboard/view/chat_view.dart';

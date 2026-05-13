@@ -125,7 +125,7 @@ class SellerController extends GetxController {
     try {
       isDetectingLocation.value = true;
 
-      // 🔥 1. CHECK LOCATION SERVICE
+      //  1. CHECK LOCATION SERVICE
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         AppSnackbar.error("Please enable location (GPS)");
@@ -133,7 +133,7 @@ class SellerController extends GetxController {
         return;
       }
 
-      // 🔥 2. CHECK PERMISSION
+      //  2. CHECK PERMISSION
       LocationPermission permission = await Geolocator.checkPermission();
 
       if (permission == LocationPermission.denied) {
@@ -153,12 +153,12 @@ class SellerController extends GetxController {
         return;
       }
 
-      // 🔥 3. GET LOCATION
+      //  3. GET LOCATION
       final pos = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      // 🔥 4. GET ADDRESS
+      //  4. GET ADDRESS
       final place = await placemarkFromCoordinates(pos.latitude, pos.longitude);
 
       final p = place.first;
@@ -174,14 +174,14 @@ class SellerController extends GetxController {
 
       AppSnackbar.success("Location detected successfully ✅");
     } catch (e) {
-      debugPrint("❌ Location Error: $e");
+      debugPrint("Location Error: $e");
       AppSnackbar.error("Failed to detect location");
     } finally {
       isDetectingLocation.value = false;
     }
   }
 
-  // ================= 🔥 IMAGE COMPRESSION =================
+  // =================  IMAGE COMPRESSION =================
   Future<File> _compressImage(File file) async {
     try {
       // 📏 ORIGINAL SIZE
@@ -253,7 +253,7 @@ class SellerController extends GetxController {
           throw Exception("File not found: $path");
         }
 
-        /// 🔥 COMPRESS BEFORE UPLOAD
+        ///  COMPRESS BEFORE UPLOAD
         file = await _compressImage(file);
 
         final ref = _storage
@@ -263,9 +263,7 @@ class SellerController extends GetxController {
             .child("image_$i.jpg");
 
         final metadata = SettableMetadata(contentType: "image/jpeg");
-
         final uploadTask = ref.putFile(file, metadata);
-
         uploadTask.snapshotEvents.listen((event) {
           final progress = (event.bytesTransferred / event.totalBytes) * 100;
           debugPrint("Upload [$i]: ${progress.toStringAsFixed(2)}%");
