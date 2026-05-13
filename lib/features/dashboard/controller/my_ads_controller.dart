@@ -143,7 +143,7 @@ class MyAdsController extends GetxController {
 
               const SizedBox(height: 8),
 
-              // 📄 Description
+              //  Description
               Text(
                 "This action will permanently remove your ad. This cannot be undone.",
                 textAlign: TextAlign.center,

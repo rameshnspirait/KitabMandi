@@ -353,10 +353,10 @@ class SellerController extends GetxController {
 
       final doc = _firestore.collection("listings").doc();
 
-      /// 🔥 Upload Images
+      ///  Upload Images
       final imageUrls = await uploadImagesToFirebase(doc.id);
 
-      /// 🔥 Save Listing
+      ///  Save Listing
       await doc.set({
         "id": doc.id,
         "title": titleController.text,
@@ -368,6 +368,7 @@ class SellerController extends GetxController {
         "year": selectedYear.value,
         "condition": selectedCondition.value,
         "images": imageUrls,
+        "isSold": false,
         "location": {
           "city": city.value,
           "state": state.value,
@@ -387,10 +388,8 @@ class SellerController extends GetxController {
         "createdAt": FieldValue.serverTimestamp(),
         "updatedAt": FieldValue.serverTimestamp(),
       });
-
       clear();
       Get.back();
-
       AppSnackbar.success("Congratulations your ad is posted 🚀");
     } catch (e) {
       AppSnackbar.error("Upload failed");
