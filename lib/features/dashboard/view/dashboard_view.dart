@@ -26,7 +26,7 @@ class _DashboardViewState extends State<DashboardView> {
   }
 
   void onCenterTap() {
-    Get.toNamed(AppRoutes.sellerlisting);
+    Get.toNamed(AppRoutes.addListing);
   }
 
   @override

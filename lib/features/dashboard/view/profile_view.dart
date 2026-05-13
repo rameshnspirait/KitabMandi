@@ -71,9 +71,11 @@ class ProfileView extends StatelessWidget {
               context,
               title: "Account",
               children: [
-                _tile(context, Icons.book_outlined, "My Listings", () {}),
+                _tile(context, Icons.book_outlined, "My Listings", () {
+                  Get.toNamed(AppRoutes.viewListing);
+                }),
                 _tile(context, Icons.shopping_bag_outlined, "My Orders", () {}),
-                _tile(context, Icons.favorite_border, "Wishlist", () {
+                _tile(context, Icons.favorite_border, "My Wishlist", () {
                   Get.toNamed(AppRoutes.wishlist);
                 }),
               ],

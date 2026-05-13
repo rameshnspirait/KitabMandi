@@ -5,8 +5,9 @@ class AppRoutes {
   static const auth = '/auth';
   static const forgotPassword = '/forgotPassword';
   static const wishlist = '/wishlist';
+  static const viewListing = '/viewListing';
   //  Main
   static const dashboard = '/dashboard';
   static const home = '/home';
-  static const sellerlisting = '/sellerlisting';
+  static const addListing = '/sellerlisting';
 }
