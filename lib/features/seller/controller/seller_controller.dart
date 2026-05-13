@@ -360,6 +360,7 @@ class SellerController extends GetxController {
       await doc.set({
         "id": doc.id,
         "title": titleController.text,
+        "description": descriptionController.text,
         "price": int.tryParse(priceController.text) ?? 0,
         "category": selectedCategory.value,
         "educationType": selectedEducationType.value,

@@ -4,7 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
+import 'package:kitab_mandi/core/constants/app_color.dart';
 import 'package:kitab_mandi/routes/app_routes.dart';
+import 'package:kitab_mandi/widgets/app_button.dart';
 import '../../../core/utils/app_snackbar.dart';
 import '../../../core/utils/validators.dart';
 
@@ -367,9 +369,10 @@ class AuthController extends GetxController {
                 children: [
                   /// CANCEL
                   Expanded(
-                    child: OutlinedButton(
+                    child: AppButton(
+                      backgroundColor: AppColors.primaryDark,
                       onPressed: () => Get.back(),
-                      child: const Text("Cancel"),
+                      text: "Cancel",
                     ),
                   ),
 
@@ -377,12 +380,13 @@ class AuthController extends GetxController {
 
                   /// LOGOUT
                   Expanded(
-                    child: ElevatedButton(
+                    child: AppButton(
+                      backgroundColor: AppColors.secondaryDark,
                       onPressed: () async {
                         Get.back();
                         await logout();
                       },
-                      child: const Text("Logout"),
+                      text: "Logout",
                     ),
                   ),
                 ],

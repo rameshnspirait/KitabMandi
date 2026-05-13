@@ -1,7 +1,9 @@
 class ListingModel {
   final String id;
   final String title;
+  final String description;
   final int price;
+  final int views;
   final String category;
   final String educationType;
   final String? className;
@@ -21,7 +23,9 @@ class ListingModel {
   ListingModel({
     required this.id,
     required this.title,
+    required this.description,
     required this.price,
+    required this.views,
     required this.category,
     required this.educationType,
     this.className,
@@ -42,7 +46,9 @@ class ListingModel {
     return ListingModel(
       id: map['id'] ?? "",
       title: map['title'] ?? "",
+      description: map['description'] ?? "",
       price: map['price'] ?? 0,
+      views: map['views'] ?? 0,
       category: map['category'] ?? "",
       educationType: map['educationType'] ?? "",
       className: map['class'],
@@ -68,7 +74,9 @@ class ListingModel {
     return {
       "id": id,
       "title": title,
+      "description": description,
       "price": price,
+      "views": views,
       "category": category,
       "educationType": educationType,
       "class": className,

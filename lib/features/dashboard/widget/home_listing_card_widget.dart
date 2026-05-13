@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kitab_mandi/core/utils/time_ago_utils.dart';
+import 'package:kitab_mandi/features/listing_details/view/listing_details_view.dart';
 import 'package:kitab_mandi/features/wishlist/controller/wishlist_controller.dart';
 import 'package:kitab_mandi/features/dashboard/model/listing_model.dart';
 import 'package:kitab_mandi/widgets/app_cached_image_network.dart';
@@ -24,6 +25,30 @@ class _ListingGridCardState extends State<ListingGridCard> {
     return isDark ? const Color(0xFF1A1D23) : Colors.white;
   }
 
+  String formatViews(int views) {
+    if (views >= 1000000) {
+      return "${(views / 1000000).toStringAsFixed(1)}M";
+    } else if (views >= 1000) {
+      return "${(views / 1000).toStringAsFixed(1)}K";
+    } else {
+      return views.toString();
+    }
+  }
+
+  String getDisplayLocation(Map<String, dynamic> location) {
+    final subLocality = location['subLocality'] ?? "";
+    final locality = location['locality'] ?? "";
+    final city = location['city'] ?? "";
+
+    if (subLocality.isNotEmpty && locality.isNotEmpty) {
+      return "$subLocality, $locality";
+    } else if (locality.isNotEmpty) {
+      return locality;
+    } else {
+      return city;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -32,7 +57,11 @@ class _ListingGridCardState extends State<ListingGridCard> {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
-        onTap: () {},
+        onTap: () {
+          Get.to(
+            ListingDetailsView(listing: widget.book, docId: widget.book.id),
+          );
+        },
         child: Container(
           decoration: BoxDecoration(
             color: _surface(context),
@@ -42,19 +71,19 @@ class _ListingGridCardState extends State<ListingGridCard> {
                 color: Colors.black.withOpacity(
                   theme.brightness == Brightness.dark ? 0.25 : 0.08,
                 ),
-                blurRadius: 14,
-                offset: const Offset(0, 6),
+                blurRadius: 16,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// ================= IMAGE CAROUSEL =================
+              /// ================= IMAGE =================
               Stack(
                 children: [
                   SizedBox(
-                    height: 140,
+                    height: 150,
                     child: PageView.builder(
                       itemCount: widget.book.images.length,
                       onPageChanged: (i) {
@@ -78,19 +107,40 @@ class _ListingGridCardState extends State<ListingGridCard> {
                     ),
                   ),
 
-                  /// BOOSTED BADGE
+                  /// 🌫️ GRADIENT OVERLAY
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(18),
+                        ),
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            Colors.black.withOpacity(0.4),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  /// 🔥 BOOSTED
                   if (widget.book.isBoosted ?? false)
                     Positioned(
-                      top: 8,
-                      left: 8,
+                      top: 10,
+                      left: 10,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
+                          horizontal: 10,
+                          vertical: 5,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.orange,
-                          borderRadius: BorderRadius.circular(12),
+                          gradient: const LinearGradient(
+                            colors: [Colors.orange, Colors.deepOrange],
+                          ),
+                          borderRadius: BorderRadius.circular(20),
                         ),
                         child: const Text(
                           "BOOSTED",
@@ -103,10 +153,10 @@ class _ListingGridCardState extends State<ListingGridCard> {
                       ),
                     ),
 
-                  /// FAVORITE BUTTON ❤️
+                  /// ❤️ FAVORITE
                   Positioned(
-                    top: 8,
-                    right: 8,
+                    top: 10,
+                    right: 10,
                     child: GestureDetector(
                       onTap: () {
                         wishlistController.toggleWishlist(widget.book.toMap());
@@ -120,30 +170,15 @@ class _ListingGridCardState extends State<ListingGridCard> {
                           scale: isFav ? 1.2 : 1.0,
                           duration: const Duration(milliseconds: 200),
                           child: Container(
-                            padding: const EdgeInsets.all(6),
+                            padding: const EdgeInsets.all(7),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color:
-                                  Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Colors.black.withOpacity(0.5)
-                                  : Colors.white.withOpacity(0.9),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
-                                  blurRadius: 6,
-                                ),
-                              ],
+                              color: Colors.black.withOpacity(0.4),
                             ),
                             child: Icon(
                               isFav ? Icons.favorite : Icons.favorite_border,
-                              color: isFav
-                                  ? Colors.red
-                                  : Theme.of(context).brightness ==
-                                        Brightness.dark
-                                  ? Colors.white
-                                  : Colors.black87,
-                              size: 20,
+                              color: isFav ? Colors.red : Colors.white,
+                              size: 18,
                             ),
                           ),
                         );
@@ -151,26 +186,36 @@ class _ListingGridCardState extends State<ListingGridCard> {
                     ),
                   ),
 
-                  /// DOT INDICATOR
+                  /// 👁 PREMIUM VIEWS BADGE
                   Positioned(
-                    bottom: 8,
-                    left: 0,
-                    right: 0,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        widget.book.images.length,
-                        (i) => Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 3),
-                          width: currentImage == i ? 8 : 6,
-                          height: 6,
-                          decoration: BoxDecoration(
-                            color: currentImage == i
-                                ? Colors.white
-                                : Colors.white54,
-                            borderRadius: BorderRadius.circular(10),
+                    bottom: 10,
+                    left: 10,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.6),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.visibility_rounded,
+                            size: 14,
+                            color: Colors.white,
                           ),
-                        ),
+                          const SizedBox(width: 5),
+                          Text(
+                            formatViews(widget.book.views),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -179,45 +224,56 @@ class _ListingGridCardState extends State<ListingGridCard> {
 
               /// ================= DETAILS =================
               Padding(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    /// PRICE
-                    Text(
-                      '₹ ' + widget.book.price.toString(),
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.primary,
-                      ),
+                    /// 💰 PRICE
+                    Row(
+                      mainAxisAlignment: .spaceBetween,
+                      children: [
+                        Text(
+                          '₹ ${widget.book.price}',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                        Text(
+                          TimeAgoUtil.timeAgo(widget.book.createdAt),
+                          style: const TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
                     ),
 
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
 
-                    /// TITLE (SAFE RESPONSIVE)
+                    /// 🏷 TITLE
                     Text(
                       widget.book.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: theme.textTheme.bodyLarge?.color,
                       ),
                     ),
 
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
+
+                    /// 👤 SELLER
                     Row(
                       children: [
-                        Icon(Icons.person, size: 12, color: Colors.grey),
-                        const SizedBox(width: 4),
+                        const Icon(Icons.person, size: 13, color: Colors.grey),
+                        const SizedBox(width: 5),
                         Expanded(
                           child: Text(
-                            'Published By ' +
-                                widget.book.seller['name'].toString().split(
-                                  ' ',
-                                )[0],
+                            widget.book.seller['name'].toString().split(' ')[0],
                             style: const TextStyle(
                               fontSize: 11,
                               color: Colors.grey,
@@ -227,12 +283,17 @@ class _ListingGridCardState extends State<ListingGridCard> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
 
-                    /// LOCATION + TIME
+                    const SizedBox(height: 6),
+
+                    /// 📍 LOCATION + TIME
                     Row(
                       children: [
-                        Icon(Icons.location_on, size: 12, color: Colors.grey),
+                        const Icon(
+                          Icons.location_on,
+                          size: 13,
+                          color: Colors.grey,
+                        ),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
@@ -242,14 +303,6 @@ class _ListingGridCardState extends State<ListingGridCard> {
                               color: Colors.grey,
                             ),
                             overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-
-                        Text(
-                          TimeAgoUtil.timeAgo(widget.book.createdAt),
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: Colors.grey,
                           ),
                         ),
                       ],
@@ -262,19 +315,5 @@ class _ListingGridCardState extends State<ListingGridCard> {
         ),
       ),
     );
-  }
-
-  String getDisplayLocation(Map<String, dynamic> location) {
-    final subLocality = location['subLocality'] ?? "";
-    final locality = location['locality'] ?? "";
-    final city = location['city'] ?? "";
-
-    if (subLocality.isNotEmpty && locality.isNotEmpty) {
-      return "$subLocality, $locality";
-    } else if (locality.isNotEmpty) {
-      return locality;
-    } else {
-      return city;
-    }
   }
 }

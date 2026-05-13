@@ -5,6 +5,8 @@ import 'package:kitab_mandi/features/auth/view/forgot_password_view.dart';
 import 'package:kitab_mandi/features/dashboard/binding/dashboard_binding.dart';
 import 'package:kitab_mandi/features/dashboard/binding/home_binding.dart';
 import 'package:kitab_mandi/features/dashboard/view/my_ads_view.dart';
+import 'package:kitab_mandi/features/listing_details/binding/listing_details_binding.dart';
+import 'package:kitab_mandi/features/listing_details/view/listing_details_view.dart';
 import 'package:kitab_mandi/features/seller/binding/seller_binding.dart';
 import 'package:kitab_mandi/features/wishlist/binding/wishlist_binding.dart';
 import 'package:kitab_mandi/features/dashboard/view/dashboard_view.dart';
@@ -50,8 +52,14 @@ class AppPages {
       binding: SellerBinding(),
     ),
     GetPage(
-      name: AppRoutes.viewListing,
+      name: AppRoutes.myAds,
       page: () => MyAdsView(),
+      // binding: MyAds(),
+    ),
+    GetPage(
+      name: AppRoutes.listingDetailsView,
+      page: () => ListingDetailsView(listing: Get.find(), docId: Get.find()),
+      binding: ListingDetailsBinding(),
       // binding: MyAds(),
     ),
   ];

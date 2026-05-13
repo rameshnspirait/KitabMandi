@@ -64,18 +64,19 @@ class HomeView extends StatelessWidget {
           }
 
           ///  DATA STATE
-          return MasonryGridView.count(
-            crossAxisCount: 2,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+          return GridView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              childAspectRatio: 0.65, //  controls height
+            ),
             itemCount: homeCtrl.listings.length,
             itemBuilder: (context, index) {
               final book = homeCtrl.listings[index];
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: ListingGridCard(book: book),
-              );
+
+              return ListingGridCard(book: book);
             },
           );
         }),

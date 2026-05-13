@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kitab_mandi/core/constants/app_color.dart';
 import 'package:kitab_mandi/core/constants/app_text_style.dart';
 import 'package:kitab_mandi/core/controller/theme_controller.dart';
 import 'package:kitab_mandi/features/auth/controller/auth_controller.dart';
@@ -72,7 +73,7 @@ class ProfileView extends StatelessWidget {
               title: "Account",
               children: [
                 _tile(context, Icons.book_outlined, "My Listings", () {
-                  Get.toNamed(AppRoutes.viewListing);
+                  Get.toNamed(AppRoutes.myAds);
                 }),
                 _tile(context, Icons.shopping_bag_outlined, "My Orders", () {}),
                 _tile(context, Icons.favorite_border, "My Wishlist", () {
@@ -299,6 +300,7 @@ class ProfileView extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: AppButton(
+        backgroundColor: AppColors.secondaryDark,
         text: "Logout",
         onPressed: () {
           authCtrl.showLogoutDialog(context);
