@@ -6,10 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:kitab_mandi/core/constants/app_color.dart';
 import 'package:kitab_mandi/features/dashboard/controller/home_controller.dart';
 import 'package:kitab_mandi/features/dashboard/model/listing_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ListingDetailsController extends GetxController {
   RxInt currentIndex = 0.obs;
   RxBool isDeleting = false.obs;
+  final currentUser = FirebaseAuth.instance.currentUser;
 
   void changeIndex(int index) {
     currentIndex.value = index;
@@ -193,5 +195,16 @@ class ListingDetailsController extends GetxController {
         ),
       ),
     );
+  }
+
+  //==================CALL TO SELLER===========
+  Future<void> makePhoneCall(String phoneNumber) async {
+    final Uri url = Uri(scheme: 'tel', path: phoneNumber);
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      Get.snackbar("Error", "Could not open dialer");
+    }
   }
 }

@@ -259,40 +259,82 @@ class _ListingDetailsViewState extends State<ListingDetailsView> {
             BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10),
           ],
         ),
-        child: Row(
-          children: [
-            //  EDIT
-            Expanded(
-              child: AppButton(
-                text: "Edit",
-                onPressed: () {
-                  Get.toNamed(
-                    "/edit",
-                    arguments: {
-                      "listing": widget.listing,
-                      "docId": widget.docId,
-                    },
-                  );
-                },
-              ),
-            ),
+        child: Builder(
+          builder: (context) {
+            final currentUid = controller.currentUser?.uid;
+            final sellerUid = widget.listing.seller['uid'];
 
-            const SizedBox(width: 10),
+            /// ✅ CHECK OWNER
+            final isOwner = currentUid == sellerUid;
 
-            //  DELETE
-            Expanded(
-              child: Obx(
-                () => AppButton(
-                  text: "Remove",
-                  isLoading: controller.isDeleting.value,
-                  backgroundColor: AppColors.secondaryDark,
-                  onPressed: () {
-                    controller.confirmDelete(widget.listing);
-                  },
-                ),
-              ),
-            ),
-          ],
+            if (isOwner) {
+              // ================= OWNER UI =================
+              return Row(
+                children: [
+                  // ✏️ EDIT
+                  Expanded(
+                    child: AppButton(
+                      text: "Edit",
+                      onPressed: () {
+                        Get.toNamed(
+                          "/edit",
+                          arguments: {
+                            "listing": widget.listing,
+                            "docId": widget.docId,
+                          },
+                        );
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(width: 10),
+
+                  // 🗑 DELETE
+                  Expanded(
+                    child: Obx(
+                      () => AppButton(
+                        text: "Remove",
+                        isLoading: controller.isDeleting.value,
+                        backgroundColor: AppColors.secondaryDark,
+                        onPressed: () {
+                          controller.confirmDelete(widget.listing);
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            } else {
+              // ================= OTHER USER UI =================
+              return Row(
+                children: [
+                  // 💬 CHAT
+                  Expanded(
+                    child: AppButton(
+                      backgroundColor: AppColors.secondaryDark,
+                      text: "Chat",
+                      onPressed: () {},
+                    ),
+                  ),
+
+                  const SizedBox(width: 10),
+
+                  // 📞 CALL
+                  Expanded(
+                    child: AppButton(
+                      text: "Call",
+                      backgroundColor: Colors.green,
+                      onPressed: () {
+                        controller.makePhoneCall(
+                          widget.listing.seller['phone'],
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              );
+            }
+          },
         ),
       ),
     );

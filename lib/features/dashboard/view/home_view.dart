@@ -64,19 +64,35 @@ class HomeView extends StatelessWidget {
           }
 
           ///  DATA STATE
-          return GridView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              childAspectRatio: 0.65, //  controls height
-            ),
-            itemCount: homeCtrl.listings.length,
-            itemBuilder: (context, index) {
-              final book = homeCtrl.listings[index];
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              double width = constraints.maxWidth;
 
-              return ListingGridCard(book: book);
+              int crossAxisCount = 2;
+
+              if (width > 900) {
+                crossAxisCount = 4;
+              } else if (width > 600) {
+                crossAxisCount = 3;
+              }
+
+              return GridView.builder(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  mainAxisExtent: 300,
+                ),
+                itemCount: homeCtrl.listings.length,
+                itemBuilder: (context, index) {
+                  final book = homeCtrl.listings[index];
+                  return ListingGridCard(book: book);
+                },
+              );
             },
           );
         }),

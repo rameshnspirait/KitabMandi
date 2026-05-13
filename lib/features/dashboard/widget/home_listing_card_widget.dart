@@ -77,13 +77,14 @@ class _ListingGridCardState extends State<ListingGridCard> {
             ],
           ),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start, // 🔥 IMPORTANT
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               /// ================= IMAGE =================
               Stack(
                 children: [
                   SizedBox(
-                    height: 150,
+                    height: 140,
                     child: PageView.builder(
                       itemCount: widget.book.images.length,
                       onPageChanged: (i) {
@@ -273,11 +274,12 @@ class _ListingGridCardState extends State<ListingGridCard> {
                         const SizedBox(width: 5),
                         Expanded(
                           child: Text(
-                            widget.book.seller['name'].toString().split(' ')[0],
+                            widget.book.seller['name'].toString(),
                             style: const TextStyle(
                               fontSize: 11,
                               color: Colors.grey,
                             ),
+                            maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -300,9 +302,11 @@ class _ListingGridCardState extends State<ListingGridCard> {
                             getDisplayLocation(widget.book.location),
                             style: const TextStyle(
                               fontSize: 11,
+
                               color: Colors.grey,
                             ),
                             overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
                           ),
                         ),
                       ],

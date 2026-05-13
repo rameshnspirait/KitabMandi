@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kitab_mandi/core/constants/app_color.dart';
 import 'package:kitab_mandi/features/seller/controller/seller_controller.dart';
 import 'package:kitab_mandi/widgets/app_button.dart';
 import 'package:kitab_mandi/widgets/app_text.dart';
@@ -289,6 +290,7 @@ class SellerListingView extends StatelessWidget {
 
               // ================= SUBMIT =================
               AppButton(
+                backgroundColor: AppColors.secondaryDark,
                 text: "Publish Listing",
                 isLoading: controller.isUploading.value,
                 onPressed: controller.uploadListing,
