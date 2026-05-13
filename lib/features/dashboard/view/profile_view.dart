@@ -4,12 +4,14 @@ import 'package:kitab_mandi/core/constants/app_color.dart';
 import 'package:kitab_mandi/core/constants/app_text_style.dart';
 import 'package:kitab_mandi/core/controller/theme_controller.dart';
 import 'package:kitab_mandi/features/auth/controller/auth_controller.dart';
+import 'package:kitab_mandi/features/dashboard/controller/profile_controller.dart';
 import 'package:kitab_mandi/routes/app_routes.dart';
 import 'package:kitab_mandi/widgets/app_button.dart';
 
 class ProfileView extends StatelessWidget {
   ProfileView({super.key});
   final authCtrl = Get.find<AuthController>();
+  final profileCtrl = Get.put(ProfileController());
   Color _background(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return isDark ? const Color(0xFF1A1D23) : const Color(0xFFFFFFFF);
@@ -168,12 +170,22 @@ class ProfileView extends StatelessWidget {
 
   /// 📊 STATS (modern compact cards)
   Widget _buildStats(BuildContext context) {
-    return Row(
-      children: [
-        _statItem(context, "12", "Listings"),
-        _statItem(context, "8", "Sold"),
-        _statItem(context, "5", "Bought"),
-      ],
+    return Obx(
+      () => Row(
+        children: [
+          _statItem(
+            context,
+            profileCtrl.totalListings.value.toString(),
+            "Listings",
+          ),
+          _statItem(context, profileCtrl.soldListings.value.toString(), "Sold"),
+          _statItem(
+            context,
+            profileCtrl.boughtListings.value.toString(),
+            "Bought",
+          ),
+        ],
+      ),
     );
   }
 

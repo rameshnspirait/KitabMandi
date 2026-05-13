@@ -4,6 +4,7 @@ import 'package:kitab_mandi/features/auth/view/auth_view.dart';
 import 'package:kitab_mandi/features/auth/view/forgot_password_view.dart';
 import 'package:kitab_mandi/features/dashboard/binding/dashboard_binding.dart';
 import 'package:kitab_mandi/features/dashboard/binding/home_binding.dart';
+import 'package:kitab_mandi/features/dashboard/binding/profile_binding.dart';
 import 'package:kitab_mandi/features/dashboard/view/my_ads_view.dart';
 import 'package:kitab_mandi/features/listing_details/binding/listing_details_binding.dart';
 import 'package:kitab_mandi/features/listing_details/view/listing_details_view.dart';
@@ -37,7 +38,7 @@ class AppPages {
     GetPage(
       name: AppRoutes.dashboard,
       page: () => const DashboardView(),
-      bindings: [DashboardBinding(), HomeBinding()],
+      bindings: [DashboardBinding(), HomeBinding(), ProfileBinding()],
     ),
 
     GetPage(
