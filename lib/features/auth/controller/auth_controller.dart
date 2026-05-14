@@ -78,11 +78,17 @@ class AuthController extends GetxController {
 
   /// ================= CLEAR HELPERS =================
   void clearAllFields() {
+    nameController.text = "";
+    phoneController.text = "";
+    emailController.text = "";
+    forgotEmailController.text = "";
+    passwordController.text = "";
     nameController.clear();
     phoneController.clear();
     emailController.clear();
     forgotEmailController.clear();
     passwordController.clear();
+    update();
   }
 
   void clearLoginFields() {
@@ -171,17 +177,15 @@ class AuthController extends GetxController {
         "provider": isGoogleUser.value ? "google" : "email",
         "createdAt": FieldValue.serverTimestamp(),
       });
-
       await fetchUserData();
-
       AppSnackbar.success("Signup successful 🚀");
-
-      clearSignupFields();
-
+      clearAllFields();
       isLogin.value = true;
-      isGoogleUser.value = false;
+      if (isGoogleUser.value) {
+        Get.offAllNamed(AppRoutes.wrapper);
+      }
 
-      Get.offAllNamed(AppRoutes.wrapper);
+      isGoogleUser.value = false;
     } on FirebaseAuthException catch (e) {
       AppSnackbar.error(_handleAuthError(e));
     } catch (e) {
@@ -214,7 +218,7 @@ class AuthController extends GetxController {
 
       //  SUCCESS FLOW
 
-      clearForgotFields();
+      clearAllFields();
       Get.back(result: true); // ✅ go back
       AppSnackbar.success("Password reset link sent 📩");
     } on FirebaseAuthException catch (e) {
@@ -230,17 +234,13 @@ class AuthController extends GetxController {
   Future<void> login() async {
     try {
       isLoading.value = true;
-
       _isManualLogin = true;
-
       await _auth.signInWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
-
-      clearLoginFields();
-
-      Get.offAllNamed(AppRoutes.wrapper);
+      // Get.offAllNamed(AppRoutes.wrapper);
+      clearAllFields();
     } on FirebaseAuthException catch (e) {
       _isManualLogin = false;
       AppSnackbar.error(_handleAuthError(e));

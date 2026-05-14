@@ -210,38 +210,6 @@ class ProfileView extends StatelessWidget {
     );
   }
 
-  /// ⚡ QUICK ACTIONS (modern chip-style feel)
-  // Widget _buildQuickActions(BuildContext context) {
-  //   return Row(
-  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //     children: [
-  //       _action(context, Icons.add_circle_outline, "Sell"),
-  //       _action(context, Icons.list_alt_outlined, "Ads"),
-  //       _action(context, Icons.favorite_border, "Wishlist"),
-  //       _action(context, Icons.chat_bubble_outline, "Chat"),
-  //     ],
-  //   );
-  // }
-
-  // Widget _action(BuildContext context, IconData icon, String label) {
-  //   final theme = Theme.of(context);
-
-  //   return Column(
-  //     children: [
-  //       Container(
-  //         padding: const EdgeInsets.all(10),
-  //         decoration: BoxDecoration(
-  //           color: theme.colorScheme.primary.withOpacity(0.10),
-  //           shape: BoxShape.circle,
-  //         ),
-  //         child: Icon(icon, size: 20, color: theme.colorScheme.primary),
-  //       ),
-  //       const SizedBox(height: 6),
-  //       Text(label, style: AppTextStyles.caption(context)),
-  //     ],
-  //   );
-  // }
-
   /// 🌗 THEME SWITCH (clean surface)
   Widget _themeSwitch(BuildContext context, ThemeController controller) {
     return Container(

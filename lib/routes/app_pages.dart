@@ -2,9 +2,12 @@ import 'package:get/get.dart';
 import 'package:kitab_mandi/features/auth/binding/auth_binding.dart';
 import 'package:kitab_mandi/features/auth/view/auth_view.dart';
 import 'package:kitab_mandi/features/auth/view/forgot_password_view.dart';
+import 'package:kitab_mandi/features/dashboard/binding/chat_binding.dart';
 import 'package:kitab_mandi/features/dashboard/binding/dashboard_binding.dart';
 import 'package:kitab_mandi/features/dashboard/binding/home_binding.dart';
 import 'package:kitab_mandi/features/dashboard/binding/profile_binding.dart';
+import 'package:kitab_mandi/features/dashboard/view/chat_view.dart';
+import 'package:kitab_mandi/features/dashboard/view/chat_room_view.dart';
 import 'package:kitab_mandi/features/dashboard/view/my_ads_view.dart';
 import 'package:kitab_mandi/features/listing_details/binding/listing_details_binding.dart';
 import 'package:kitab_mandi/features/listing_details/view/listing_details_view.dart';
@@ -61,6 +64,18 @@ class AppPages {
       name: AppRoutes.listingDetailsView,
       page: () => ListingDetailsView(listing: Get.find(), docId: Get.find()),
       binding: ListingDetailsBinding(),
+      // binding: MyAds(),
+    ),
+    GetPage(
+      name: AppRoutes.chatView,
+      page: () => ChatView(),
+      binding: ChatBinding(),
+      // binding: MyAds(),
+    ),
+    GetPage(
+      name: AppRoutes.chatRoom,
+      page: () => ChatRoomView(),
+      // binding: Chat(),
       // binding: MyAds(),
     ),
   ];

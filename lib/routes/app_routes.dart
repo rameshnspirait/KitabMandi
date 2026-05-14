@@ -7,6 +7,8 @@ class AppRoutes {
   static const wishlist = '/wishlist';
   static const myAds = '/myAds';
   static const listingDetailsView = '/listingDetailsView';
+  static const chatView = '/chatView';
+  static const chatRoom = '/chatRoom';
   //  Main
   static const dashboard = '/dashboard';
   static const home = '/home';

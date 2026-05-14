@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kitab_mandi/core/constants/app_color.dart';
+import 'package:kitab_mandi/features/dashboard/controller/chat_controller.dart';
 import 'package:kitab_mandi/features/dashboard/model/listing_model.dart';
 import 'package:kitab_mandi/features/listing_details/controller/listing_details_controller.dart';
 import 'package:kitab_mandi/routes/app_routes.dart';
@@ -25,6 +26,7 @@ class ListingDetailsView extends StatefulWidget {
 
 class _ListingDetailsViewState extends State<ListingDetailsView> {
   final controller = Get.put(ListingDetailsController());
+  final chatController = Get.put(ChatController());
 
   @override
   void initState() {
@@ -316,7 +318,9 @@ class _ListingDetailsViewState extends State<ListingDetailsView> {
                     child: AppButton(
                       backgroundColor: AppColors.secondaryDark,
                       text: "Chat",
-                      onPressed: () {},
+                      onPressed: () async {
+                        await chatController.startChat(widget.listing);
+                      },
                     ),
                   ),
 
