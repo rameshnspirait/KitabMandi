@@ -172,44 +172,78 @@ class SellerListingView extends StatelessWidget {
                 ),
 
               /// ================= COLLEGE =================
-              if (controller.selectedEducationType.value == "College")
-                AppTextField(
+              Obx(() {
+                if (controller.selectedEducationType.value != "College") {
+                  return const SizedBox.shrink();
+                }
+
+                return AppTextField(
                   controller: controller.degreeController,
-                  hintText: "Select Degree",
+                  hintText: controller.selectedDegree.value.isNotEmpty
+                      ? controller.selectedDegree.value
+                      : "Select Degree",
                   readOnly: true,
                   suffixIcon: PopupMenuButton<String>(
                     icon: const Icon(Icons.arrow_drop_down),
                     onSelected: (val) {
+                      ///  Update Rx
                       controller.selectedDegree.value = val;
+
+                      ///  Update Controller
                       controller.degreeController.text = val;
+
+                      ///  IMPORTANT: Reset dependent field (Year)
+                      controller.selectedYear.value = "";
+                      controller.yearController.clear();
                     },
                     itemBuilder: (_) => controller.degrees
-                        .map((e) => PopupMenuItem(value: e, child: Text(e)))
+                        .map(
+                          (e) =>
+                              PopupMenuItem<String>(value: e, child: Text(e)),
+                        )
                         .toList(),
                   ),
-                ),
+                );
+              }),
+              Obx(
+                () =>
+                    controller.selectedEducationType.value == "College" &&
+                        controller.selectedDegree.value.isNotEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: AppTextField(
+                          controller: controller.yearController,
+                          hintText: controller.selectedYear.isNotEmpty
+                              ? controller.selectedYear.value
+                              : "Select Year",
+                          readOnly: true,
+                          suffixIcon: PopupMenuButton<String>(
+                            icon: const Icon(Icons.arrow_drop_down),
+                            onSelected: (val) {
+                              controller.selectedYear.value = val;
+                              controller.yearController.text = val;
+                            },
+                            itemBuilder: (_) {
+                              final years =
+                                  controller.degreeYears[controller
+                                      .selectedDegree
+                                      .value] ??
+                                  [];
 
-              if (controller.selectedEducationType.value == "College" &&
-                  controller.selectedDegree.value.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: AppTextField(
-                    controller: controller.yearController,
-                    hintText: "Select Year",
-                    readOnly: true,
-                    suffixIcon: PopupMenuButton<String>(
-                      icon: const Icon(Icons.arrow_drop_down),
-                      onSelected: (val) {
-                        controller.selectedYear.value = val;
-                        controller.yearController.text = val;
-                      },
-                      itemBuilder: (_) => controller
-                          .degreeYears[controller.selectedDegree.value]!
-                          .map((e) => PopupMenuItem(value: e, child: Text(e)))
-                          .toList(),
-                    ),
-                  ),
-                ),
+                              return years
+                                  .map(
+                                    (e) => PopupMenuItem<String>(
+                                      value: e,
+                                      child: Text(e),
+                                    ),
+                                  )
+                                  .toList();
+                            },
+                          ),
+                        ),
+                      )
+                    : SizedBox.shrink(),
+              ),
 
               const SizedBox(height: 20),
 

@@ -7,10 +7,11 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:kitab_mandi/features/dashboard/controller/home_controller.dart';
+import 'package:kitab_mandi/features/dashboard/controller/my_ads_controller.dart';
 import 'package:kitab_mandi/features/dashboard/model/listing_model.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:kitab_mandi/core/utils/app_snackbar.dart';
+import 'package:kitab_mandi/routes/app_routes.dart';
 
 class SellerController extends GetxController {
   final _firestore = FirebaseFirestore.instance;
@@ -48,6 +49,8 @@ class SellerController extends GetxController {
 
   RxBool isDetectingLocation = false.obs;
   RxBool isUploading = false.obs;
+
+  final myAdsCtrl = Get.find<MyAdsController>();
 
   String get fullAddress => [
     subLocality.value,
@@ -140,9 +143,9 @@ class SellerController extends GetxController {
     selectedCategory.value = listingModel!.category;
     selectedCondition.value = listingModel!.condition;
     selectedEducationType.value = listingModel!.educationType;
-    selectedClass.value = listingModel!.className ?? "";
-    selectedDegree.value = listingModel!.degree ?? "";
-    selectedYear.value = listingModel!.year ?? "";
+    selectedClass.value = listingModel?.className ?? "";
+    selectedDegree.value = listingModel?.degree ?? "";
+    selectedYear.value = listingModel?.year ?? "";
 
     images.assignAll(listingModel!.images);
     fullAddress = listingModel!.location;
@@ -305,36 +308,45 @@ class SellerController extends GetxController {
       /// ================= FIRESTORE =================
       if (isEdit.value) {
         await _firestore.collection("listings").doc(listingId).update(data);
-        Get.back(result: true);
-        Get.back(result: true);
-
-        ///  SHOW SUCCESS FIRST
         AppSnackbar.success("Listing updated successfully");
       } else {
         final doc = _firestore.collection("listings").doc();
+        final userDoc = await _firestore
+            .collection('users')
+            .doc(user.uid)
+            .get();
+
+        final userData = userDoc.data();
 
         await doc.set({
           ...data,
           "id": doc.id,
           "createdAt": FieldValue.serverTimestamp(),
           "isSold": false,
-          "sellerId": user.uid,
+          "seller": {
+            "uid": user.uid,
+            "name": userData?["name"] ?? "",
+            "email": userData?["email"] ?? "",
+            "phone": userData?["phone"] ?? "",
+            "photo": userData?["photoUrl"] ?? "",
+          },
         });
-
-        ///  SHOW SUCCESS FIRST
         AppSnackbar.success("Listing created successfully");
       }
+      Get.offAllNamed(AppRoutes.dashboard);
 
-      ///  WAIT SO USER CAN SEE MESSAGE
-      await Future.delayed(const Duration(milliseconds: 800));
-      Get.back(result: true);
+      /// ================= REFRESH HOME =================
+      if (Get.isRegistered<HomeController>()) {
+        await Get.find<HomeController>().fetchListings();
+      }
+      if (Get.isRegistered<MyAdsController>()) {
+        await Get.find<MyAdsController>().fetchMyAds();
+      }
 
-      ///  SAFE NAVIGATION
-      if (Get.isOverlaysOpen) Get.back(); // close snackbar/dialog if any
-      // go back with result
+      /// ================= NAVIGATION =================
+      //  ALWAYS GO TO HOME
     } catch (e) {
       debugPrint("UPLOAD ERROR: $e");
-
       AppSnackbar.error("Something went wrong. Try again.");
     } finally {
       isUploading.value = false;

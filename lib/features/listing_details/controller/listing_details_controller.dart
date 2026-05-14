@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:kitab_mandi/core/constants/app_color.dart';
 import 'package:kitab_mandi/features/dashboard/controller/home_controller.dart';
+import 'package:kitab_mandi/features/dashboard/controller/my_ads_controller.dart';
 import 'package:kitab_mandi/features/dashboard/model/listing_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -12,6 +13,7 @@ class ListingDetailsController extends GetxController {
   RxInt currentIndex = 0.obs;
   RxBool isDeleting = false.obs;
   final currentUser = FirebaseAuth.instance.currentUser;
+  final myAdsCtrl = Get.find<MyAdsController>();
 
   void changeIndex(int index) {
     currentIndex.value = index;
@@ -50,13 +52,13 @@ class ListingDetailsController extends GetxController {
     try {
       isDeleting.value = true;
 
-      // 🔥 Loader
+      /// ================= SHOW LOADER =================
       Get.dialog(
         const Center(child: CircularProgressIndicator()),
         barrierDismissible: false,
       );
 
-      // ================= DELETE IMAGES =================
+      /// ================= DELETE IMAGES =================
       for (String url in images) {
         try {
           await FirebaseStorage.instance.refFromURL(url).delete();
@@ -65,28 +67,63 @@ class ListingDetailsController extends GetxController {
         }
       }
 
-      // ================= DELETE FIRESTORE DOC =================
+      /// ================= DELETE FROM WISHLIST =================
+      /// (Assuming flat collection: wishlist/{id})
+      try {
+        final wishlistSnap = await FirebaseFirestore.instance
+            .collection('wishlist')
+            .where('listingId', isEqualTo: docId)
+            .get();
+
+        for (var doc in wishlistSnap.docs) {
+          await doc.reference.delete();
+        }
+      } catch (e) {
+        debugPrint("Wishlist cleanup failed: $e");
+      }
+
+      /// ================= DELETE LISTING =================
       await FirebaseFirestore.instance
           .collection('listings')
           .doc(docId)
           .delete();
 
-      // ================= CLOSE LOADER =================
-      Get.back(); // loader
-      Get.back(); // details screen
+      /// ================= CLOSE LOADER =================
+      if (Get.isDialogOpen ?? false) Get.back();
 
-      // ================= UPDATE MY ADS LIST =================
+      /// ================= SHOW SUCCESS =================
+      Get.snackbar(
+        "Deleted",
+        "Listing removed successfully",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+
+      /// small delay so user sees snackbar
+      await Future.delayed(const Duration(milliseconds: 600));
+
+      /// ================= NAVIGATION =================
+      if (Get.isOverlaysOpen) Get.back(); // close snackbar if needed
+      Get.back(result: true); // go back to previous screen
+
+      /// ================= REFRESH DATA =================
       if (Get.isRegistered<HomeController>()) {
         Get.find<HomeController>().fetchListings();
       }
 
-      Get.snackbar("Deleted", "Listing removed successfully");
+      if (Get.isRegistered<MyAdsController>()) {
+        Get.find<MyAdsController>().fetchMyAds();
+      }
     } catch (e) {
-      Get.back();
+      debugPrint("DELETE ERROR: $e");
 
+      /// close loader safely
+      if (Get.isDialogOpen ?? false) Get.back();
+
+      /// error snackbar
       Get.snackbar(
         "Error",
         "Failed to delete listing",
+        snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
