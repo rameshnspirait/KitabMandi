@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:kitab_mandi/core/constants/app_color.dart';
 import 'package:kitab_mandi/core/constants/app_text_style.dart';
 import 'package:kitab_mandi/core/controller/theme_controller.dart';
+import 'package:kitab_mandi/features/about_app/about_app_view.dart';
+import 'package:kitab_mandi/features/about_app/terms_policies_view.dart';
 import 'package:kitab_mandi/features/auth/controller/auth_controller.dart';
 import 'package:kitab_mandi/features/dashboard/controller/profile_controller.dart';
 import 'package:kitab_mandi/routes/app_routes.dart';
@@ -77,7 +79,7 @@ class ProfileView extends StatelessWidget {
                 _tile(context, Icons.book_outlined, "My Listings", () {
                   Get.toNamed(AppRoutes.myAds);
                 }),
-                _tile(context, Icons.shopping_bag_outlined, "My Orders", () {}),
+                // _tile(context, Icons.shopping_bag_outlined, "My Orders", () {}),
                 _tile(context, Icons.favorite_border, "My Wishlist", () {
                   Get.toNamed(AppRoutes.wishlist);
                 }),
@@ -91,13 +93,12 @@ class ProfileView extends StatelessWidget {
               title: "Support",
               children: [
                 _tile(context, Icons.help_outline, "Help Center", () {}),
-                _tile(
-                  context,
-                  Icons.policy_outlined,
-                  "Terms & Policies",
-                  () {},
-                ),
-                _tile(context, Icons.info_outline, "About App", () {}),
+                _tile(context, Icons.policy_outlined, "Terms & Policies", () {
+                  Get.to(TermsPoliciesView());
+                }),
+                _tile(context, Icons.info_outline, "About App", () {
+                  Get.to(AboutView());
+                }),
               ],
             ),
 

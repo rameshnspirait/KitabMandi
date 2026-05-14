@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
 import 'package:kitab_mandi/core/constants/app_color.dart';
+import 'package:kitab_mandi/core/controller/location_controller.dart';
 import 'package:kitab_mandi/routes/app_routes.dart';
 import 'package:kitab_mandi/widgets/app_button.dart';
 import '../../../core/utils/app_snackbar.dart';
@@ -168,6 +169,20 @@ class AuthController extends GetxController {
         return;
       }
 
+      /// 📍 GET LOCATION CONTROLLER
+      final locationController = Get.put(LocationController());
+
+      /// 📍 DETECT LOCATION ONLY IF NOT ALREADY SELECTED
+      if (locationController.selectedLocations.isEmpty) {
+        await locationController.detectCurrentLocation();
+      }
+
+      // /// 📍 GET FINAL LOCATION VALUE
+      // final location = locationController.selectedLocations.isNotEmpty
+      //     ? locationController.selectedLocations.first
+      //     : "";
+
+      /// 💾 SAVE USER DATA + LOCATION
       await _firestore.collection('users').doc(user.uid).set({
         "uid": user.uid,
         "name": name,
@@ -177,13 +192,18 @@ class AuthController extends GetxController {
         "provider": isGoogleUser.value ? "google" : "email",
         "createdAt": FieldValue.serverTimestamp(),
       });
+
+      /// OPTIONAL: refresh user data
       await fetchUserData();
+
       AppSnackbar.success("Signup successful 🚀");
+
       clearAllFields();
+
       isLogin.value = true;
-      if (isGoogleUser.value) {
-        Get.offAllNamed(AppRoutes.wrapper);
-      }
+
+      /// 🚀 NAVIGATE AFTER EVERYTHING DONE
+      Get.offAllNamed(AppRoutes.wrapper);
 
       isGoogleUser.value = false;
     } on FirebaseAuthException catch (e) {
