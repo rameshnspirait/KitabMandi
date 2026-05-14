@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:kitab_mandi/core/constants/app_color.dart';
 import 'package:kitab_mandi/features/seller/controller/seller_controller.dart';
 import 'package:kitab_mandi/widgets/app_button.dart';
+import 'package:kitab_mandi/widgets/app_cached_image_network.dart';
 import 'package:kitab_mandi/widgets/app_text.dart';
 import 'package:kitab_mandi/widgets/app_text_field.dart';
 
@@ -32,16 +33,19 @@ class SellerListingView extends StatelessWidget {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Sell Your Book / Notes"),
+        title: Text(
+          controller.isEdit.value ? "Edit Listing" : "Sell Your Book",
+        ),
         backgroundColor: _background(context),
       ),
+
       body: Obx(
         () => SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ================= IMAGE =================
+              /// ================= IMAGES =================
               AppText("Upload Photos", style: theme.textTheme.titleMedium),
               const SizedBox(height: 10),
 
@@ -50,6 +54,8 @@ class SellerListingView extends StatelessWidget {
                 runSpacing: 10,
                 children: [
                   ...List.generate(controller.images.length, (index) {
+                    final image = controller.images[index];
+
                     return Stack(
                       children: [
                         Container(
@@ -57,12 +63,18 @@ class SellerListingView extends StatelessWidget {
                           width: 90,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),
-                            image: DecorationImage(
-                              image: FileImage(File(controller.images[index])),
-                              fit: BoxFit.cover,
-                            ),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: image.startsWith("http")
+                                ? AppCachedImageNetwork(
+                                    imageUrl: image,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.file(File(image), fit: BoxFit.cover),
                           ),
                         ),
+
                         Positioned(
                           right: 0,
                           child: GestureDetector(
@@ -82,6 +94,7 @@ class SellerListingView extends StatelessWidget {
                     );
                   }),
 
+                  /// ADD IMAGE BUTTON
                   GestureDetector(
                     onTap: controller.pickImage,
                     child: Container(
@@ -100,7 +113,7 @@ class SellerListingView extends StatelessWidget {
 
               const SizedBox(height: 25),
 
-              // ================= CATEGORY =================
+              /// ================= CATEGORY =================
               AppText("Category", style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
 
@@ -117,7 +130,7 @@ class SellerListingView extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // ================= EDUCATION TYPE =================
+              /// ================= EDUCATION TYPE =================
               AppText("Education Type", style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
 
@@ -130,7 +143,6 @@ class SellerListingView extends StatelessWidget {
                     onSelected: (_) {
                       controller.selectedEducationType.value = type;
 
-                      // reset dependent fields
                       controller.selectedClass.value = "";
                       controller.selectedDegree.value = "";
                       controller.selectedYear.value = "";
@@ -141,36 +153,35 @@ class SellerListingView extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // ================= SCHOOL =================
+              /// ================= SCHOOL =================
               if (controller.selectedEducationType.value == "School")
                 AppTextField(
-                  controller: TextEditingController(
-                    text: controller.selectedClass.value,
-                  ),
+                  controller: controller.classController,
                   hintText: "Select Class",
                   readOnly: true,
                   suffixIcon: PopupMenuButton<String>(
                     icon: const Icon(Icons.arrow_drop_down),
-                    onSelected: (val) => controller.selectedClass.value = val,
+                    onSelected: (val) {
+                      controller.selectedClass.value = val;
+                      controller.classController.text = val;
+                    },
                     itemBuilder: (_) => controller.schoolClasses
                         .map((e) => PopupMenuItem(value: e, child: Text(e)))
                         .toList(),
                   ),
                 ),
 
-              // ================= COLLEGE DEGREE =================
+              /// ================= COLLEGE =================
               if (controller.selectedEducationType.value == "College")
                 AppTextField(
-                  controller: TextEditingController(
-                    text: controller.selectedDegree.value,
-                  ),
+                  controller: controller.degreeController,
                   hintText: "Select Degree",
                   readOnly: true,
                   suffixIcon: PopupMenuButton<String>(
                     icon: const Icon(Icons.arrow_drop_down),
                     onSelected: (val) {
                       controller.selectedDegree.value = val;
-                      controller.selectedYear.value = "";
+                      controller.degreeController.text = val;
                     },
                     itemBuilder: (_) => controller.degrees
                         .map((e) => PopupMenuItem(value: e, child: Text(e)))
@@ -178,20 +189,20 @@ class SellerListingView extends StatelessWidget {
                   ),
                 ),
 
-              // ================= COLLEGE YEAR =================
               if (controller.selectedEducationType.value == "College" &&
                   controller.selectedDegree.value.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 10),
                   child: AppTextField(
-                    controller: TextEditingController(
-                      text: controller.selectedYear.value,
-                    ),
+                    controller: controller.yearController,
                     hintText: "Select Year",
                     readOnly: true,
                     suffixIcon: PopupMenuButton<String>(
                       icon: const Icon(Icons.arrow_drop_down),
-                      onSelected: (val) => controller.selectedYear.value = val,
+                      onSelected: (val) {
+                        controller.selectedYear.value = val;
+                        controller.yearController.text = val;
+                      },
                       itemBuilder: (_) => controller
                           .degreeYears[controller.selectedDegree.value]!
                           .map((e) => PopupMenuItem(value: e, child: Text(e)))
@@ -200,26 +211,9 @@ class SellerListingView extends StatelessWidget {
                   ),
                 ),
 
-              // ================= EXAM =================
-              if (controller.selectedEducationType.value == "Competitive Exam")
-                AppTextField(
-                  controller: TextEditingController(
-                    text: controller.selectedClass.value,
-                  ),
-                  hintText: "Select Exam",
-                  readOnly: true,
-                  suffixIcon: PopupMenuButton<String>(
-                    icon: const Icon(Icons.arrow_drop_down),
-                    onSelected: (val) => controller.selectedClass.value = val,
-                    itemBuilder: (_) => controller.exams
-                        .map((e) => PopupMenuItem(value: e, child: Text(e)))
-                        .toList(),
-                  ),
-                ),
-
               const SizedBox(height: 20),
 
-              // ================= CONDITION =================
+              /// ================= CONDITION =================
               AppText("Condition", style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
 
@@ -236,7 +230,7 @@ class SellerListingView extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // ================= TITLE =================
+              /// ================= TITLE =================
               AppTextField(
                 controller: controller.titleController,
                 hintText: "Title",
@@ -244,7 +238,7 @@ class SellerListingView extends StatelessWidget {
 
               const SizedBox(height: 12),
 
-              // ================= PRICE =================
+              /// ================= PRICE =================
               AppTextField(
                 controller: controller.priceController,
                 hintText: "Price (₹)",
@@ -253,33 +247,31 @@ class SellerListingView extends StatelessWidget {
 
               const SizedBox(height: 12),
 
-              // ================= LOCATION =================
-              Obx(
-                () => AppTextField(
-                  controller: TextEditingController(
-                    text: controller.fullAddress,
-                  ),
-                  readOnly: true,
-                  hintText: "Detect Location",
-                  suffixIcon: controller.isDetectingLocation.value
-                      ? const Padding(
-                          padding: EdgeInsets.all(12),
-                          child: SizedBox(
-                            height: 16,
-                            width: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                        )
-                      : IconButton(
-                          icon: const Icon(Icons.my_location),
-                          onPressed: controller.detectLocation,
+              /// ================= LOCATION =================
+              AppTextField(
+                controller: controller.addressController,
+                readOnly: true,
+                hintText: controller.fullAddress.isEmpty
+                    ? "Detect Location"
+                    : controller.fullAddress,
+                suffixIcon: controller.isDetectingLocation.value
+                    ? const Padding(
+                        padding: EdgeInsets.all(12),
+                        child: SizedBox(
+                          height: 16,
+                          width: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
                         ),
-                ),
+                      )
+                    : IconButton(
+                        icon: const Icon(Icons.my_location),
+                        onPressed: controller.detectLocation,
+                      ),
               ),
 
               const SizedBox(height: 12),
 
-              // ================= DESCRIPTION =================
+              /// ================= DESCRIPTION =================
               AppTextField(
                 controller: controller.descriptionController,
                 hintText: "Description",
@@ -288,10 +280,12 @@ class SellerListingView extends StatelessWidget {
 
               const SizedBox(height: 30),
 
-              // ================= SUBMIT =================
+              /// ================= SUBMIT =================
               AppButton(
                 backgroundColor: AppColors.secondaryDark,
-                text: "Publish Listing",
+                text: controller.isEdit.value
+                    ? "Update Listing"
+                    : "Publish Listing",
                 isLoading: controller.isUploading.value,
                 onPressed: controller.uploadListing,
               ),

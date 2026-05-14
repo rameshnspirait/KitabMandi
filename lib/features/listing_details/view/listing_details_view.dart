@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:kitab_mandi/core/constants/app_color.dart';
 import 'package:kitab_mandi/features/dashboard/model/listing_model.dart';
 import 'package:kitab_mandi/features/listing_details/controller/listing_details_controller.dart';
+import 'package:kitab_mandi/routes/app_routes.dart';
 import 'package:kitab_mandi/widgets/app_button.dart';
 import 'package:kitab_mandi/widgets/app_cached_image_network.dart';
 import 'package:kitab_mandi/widgets/app_text.dart';
@@ -221,6 +222,7 @@ class _ListingDetailsViewState extends State<ListingDetailsView> {
                               ? widget.listing.className
                               : widget.listing.degree,
                         ),
+                        _row(context, "Year", widget.listing.year),
                       ],
                     ),
                   ),
@@ -260,7 +262,7 @@ class _ListingDetailsViewState extends State<ListingDetailsView> {
         decoration: BoxDecoration(
           color: _card(context),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10),
+            BoxShadow(color: AppColors.black.withOpacity(0.05), blurRadius: 10),
           ],
         ),
         child: Builder(
@@ -281,11 +283,8 @@ class _ListingDetailsViewState extends State<ListingDetailsView> {
                       text: "Edit",
                       onPressed: () {
                         Get.toNamed(
-                          "/edit",
-                          arguments: {
-                            "listing": widget.listing,
-                            "docId": widget.docId,
-                          },
+                          AppRoutes.addListing,
+                          arguments: {"listing": widget.listing},
                         );
                       },
                     ),
