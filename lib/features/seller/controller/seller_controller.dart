@@ -165,7 +165,7 @@ class SellerController extends GetxController {
 
       state.value = p.administrativeArea ?? "";
       city.value = p.locality ?? "";
-      locality.value = p.subLocality ?? "";
+      locality.value = p.locality ?? "";
       subLocality.value = p.subLocality ?? "";
       postalCode.value = p.postalCode ?? "";
 

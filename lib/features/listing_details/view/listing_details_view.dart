@@ -12,7 +12,11 @@ class ListingDetailsView extends StatefulWidget {
   final ListingModel listing;
   final String docId;
 
-  ListingDetailsView({super.key, required this.listing, required this.docId});
+  const ListingDetailsView({
+    super.key,
+    required this.listing,
+    required this.docId,
+  });
 
   @override
   State<ListingDetailsView> createState() => _ListingDetailsViewState();
@@ -179,7 +183,7 @@ class _ListingDetailsViewState extends State<ListingDetailsView> {
 
                   const SizedBox(height: 12),
 
-                  //  LOCATION (FIXED OVERFLOW ✅)
+                  //  LOCATION (FIXED OVERFLOW )
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -231,14 +235,14 @@ class _ListingDetailsViewState extends State<ListingDetailsView> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-
                   const SizedBox(height: 8),
-
                   AppText(
                     widget.listing.description,
+                    maxLines: 100,
                     style: TextStyle(
                       height: 1.5,
                       color: _textSecondary(context),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
 
