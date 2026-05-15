@@ -39,7 +39,7 @@ class HomeView extends StatelessWidget {
           }
 
           ///  EMPTY STATE
-          if (homeCtrl.listings.isEmpty) {
+          if (homeCtrl.filteredListings.isEmpty) {
             return LayoutBuilder(
               builder: (context, constraints) {
                 return ListView(
@@ -87,9 +87,9 @@ class HomeView extends StatelessWidget {
                   crossAxisSpacing: 12,
                   mainAxisExtent: 300,
                 ),
-                itemCount: homeCtrl.listings.length,
+                itemCount: homeCtrl.filteredListings.length,
                 itemBuilder: (context, index) {
-                  final book = homeCtrl.listings[index];
+                  final book = homeCtrl.filteredListings[index];
                   return ListingGridCard(book: book);
                 },
               );

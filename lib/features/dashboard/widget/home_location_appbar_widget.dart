@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kitab_mandi/core/controller/location_controller.dart';
+import 'package:kitab_mandi/features/dashboard/controller/home_controller.dart';
 import 'package:kitab_mandi/features/dashboard/widget/home_filter_widget.dart';
 import 'package:kitab_mandi/features/dashboard/widget/home_searchbar_widget.dart';
 
@@ -94,6 +95,7 @@ class LocationAppBar extends StatelessWidget implements PreferredSizeWidget {
             controller: TextEditingController(),
             onChanged: (value) {
               // 🔍 handle search
+              Get.put(HomeController()).onSearchChanged(value);
             },
             onFilterTap: () async {
               final result = await Get.to(() => FilterScreen());
