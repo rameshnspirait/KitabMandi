@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kitab_mandi/features/dashboard/model/listing_model.dart';
+import 'package:kitab_mandi/routes/app_routes.dart';
 
 class ChatController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -29,28 +30,44 @@ class ChatController extends GetxController {
         "listingImage": listing.images.isNotEmpty ? listing.images.first : "",
         "buyerId": buyerId,
         "sellerId": sellerId,
+        "isSeen": false,
         "participants": [buyerId, sellerId],
-        "lastMessage": "Hi",
+        "lastMessage": "Hello, is this available ??",
         "lastMessageTime": FieldValue.serverTimestamp(),
       });
 
       await chatRef.collection('messages').add({
         "senderId": buyerId,
-        "message": "Hi",
+        "isSeen": false,
+        "message": "Hello, is this available ??",
         "timestamp": FieldValue.serverTimestamp(),
       });
     }
 
     /// 👉 OPEN CHAT DIRECTLY
     Get.toNamed(
-      '/chatRoom',
+      AppRoutes.chatRoom,
       arguments: {
         "chatId": chatId,
-        "listingTitle": listing.title,
+        "listingTitle": listing,
         "listingImage": listing.images.first,
         "userName": listing.seller['name'],
       },
     );
+  }
+
+  Future<void> markMessagesAsSeen(String chatId, String myId) async {
+    final messages = await FirebaseFirestore.instance
+        .collection('chats')
+        .doc(chatId)
+        .collection('messages')
+        .where('receiverId', isEqualTo: myId)
+        .where('isSeen', isEqualTo: false)
+        .get();
+
+    for (var doc in messages.docs) {
+      doc.reference.update({"isSeen": true});
+    }
   }
 
   Future<Map<String, dynamic>?> getUserById(String uid) async {
