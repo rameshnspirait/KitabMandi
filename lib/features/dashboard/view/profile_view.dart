@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:kitab_mandi/core/constants/app_color.dart';
 import 'package:kitab_mandi/core/constants/app_text_style.dart';
 import 'package:kitab_mandi/core/controller/theme_controller.dart';
+import 'package:kitab_mandi/core/services/share_service.dart';
 import 'package:kitab_mandi/features/about_app/about_app_view.dart';
 import 'package:kitab_mandi/features/about_app/terms_policies_view.dart';
 import 'package:kitab_mandi/features/auth/controller/auth_controller.dart';
@@ -92,7 +93,13 @@ class ProfileView extends StatelessWidget {
               context,
               title: "Support",
               children: [
-                _tile(context, Icons.help_outline, "Help Center", () {}),
+                _tile(context, Icons.help_outline, "Help & Support", () {
+                  Get.toNamed(AppRoutes.helpSupport);
+                }),
+                _tile(context, Icons.share, "Share App", () {
+                  ShareService.shareApp();
+                  // Get.toNamed(AppRoutes.helpSupport);
+                }),
                 _tile(context, Icons.policy_outlined, "Terms & Policies", () {
                   Get.to(TermsPoliciesView());
                 }),

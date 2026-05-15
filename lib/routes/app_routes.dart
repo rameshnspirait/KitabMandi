@@ -9,6 +9,7 @@ class AppRoutes {
   static const listingDetailsView = '/listingDetailsView';
   static const chatView = '/chatView';
   static const chatRoom = '/chatRoom';
+  static const helpSupport = '/helpSupport';
   //  Main
   static const dashboard = '/dashboard';
   static const home = '/home';

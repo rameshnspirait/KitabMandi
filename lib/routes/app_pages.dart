@@ -9,6 +9,8 @@ import 'package:kitab_mandi/features/dashboard/binding/profile_binding.dart';
 import 'package:kitab_mandi/features/dashboard/view/chat_view.dart';
 import 'package:kitab_mandi/features/dashboard/view/chat_room_view.dart';
 import 'package:kitab_mandi/features/dashboard/view/my_ads_view.dart';
+import 'package:kitab_mandi/features/help_center/binding/help_support_binding.dart';
+import 'package:kitab_mandi/features/help_center/view/help_support_view.dart';
 import 'package:kitab_mandi/features/listing_details/binding/listing_details_binding.dart';
 import 'package:kitab_mandi/features/listing_details/view/listing_details_view.dart';
 import 'package:kitab_mandi/features/seller/binding/seller_binding.dart';
@@ -77,6 +79,11 @@ class AppPages {
       page: () => ChatRoomView(),
       // binding: Chat(),
       // binding: MyAds(),
+    ),
+    GetPage(
+      name: AppRoutes.helpSupport,
+      page: () => HelpSupportView(),
+      binding: HelpSupportBinding(),
     ),
   ];
 }

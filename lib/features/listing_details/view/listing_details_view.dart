@@ -178,6 +178,7 @@ class _ListingDetailsViewState extends State<ListingDetailsView> {
                   //  TITLE
                   AppText(
                     widget.listing.title,
+                    maxLines: 20,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
