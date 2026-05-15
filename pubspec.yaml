@@ -31,22 +31,22 @@ dependencies:
   carousel_slider: ^5.1.2
   url_launcher: ^6.3.2
   share_plus: ^12.0.2
-  google_maps_flutter: ^2.17.0
+  photo_view: ^0.15.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_launcher_icons: ^0.14.4
+  # flutter_launcher_icons: ^0.14.4
 
   flutter_lints: ^6.0.0
 
 # dart run flutter_launcher_icons
-flutter_icons:
-  android: true
-  ios: true
-  image_path: "assets/logo.png"
-  adaptive_icon_background: "#1F5E3B"
-  adaptive_icon_foreground: "assets/logo.png"
+# flutter_icons:
+#   android: true
+#   ios: true
+#   image_path: "assets/logo.png"
+#   adaptive_icon_background: "#1F5E3B"
+#   adaptive_icon_foreground: "assets/logo.png"
 
 flutter:
   uses-material-design: true

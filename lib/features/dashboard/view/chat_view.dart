@@ -46,6 +46,12 @@ class BuyingProductsView extends StatelessWidget {
     return StreamBuilder<QuerySnapshot>(
       stream: controller.getBuyingProducts(),
       builder: (context, snapshot) {
+        /// 🔄 LOADING STATE (initial)
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        /// ❌ ERROR STATE
         if (snapshot.hasError) {
           return _stateWidget(
             icon: Icons.error_outline,
@@ -53,36 +59,44 @@ class BuyingProductsView extends StatelessWidget {
           );
         }
 
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
+        /// 🔥 IGNORE CACHE (IMPORTANT FIX)
+        // if (snapshot.hasData && snapshot.data!.metadata.isFromCache) {
+        //   return const Center(child: CircularProgressIndicator());
+        // }
 
-        final chats = snapshot.data!.docs;
+        /// 📦 DATA
+        final docs = snapshot.data?.docs ?? [];
 
-        if (chats.isEmpty) {
+        /// 😔 EMPTY STATE
+        if (docs.isEmpty) {
           return _stateWidget(
             icon: Icons.shopping_bag_outlined,
             text: "No products yet",
           );
         }
 
-        /// GROUP
+        /// 🔁 GROUP BY listingId
         final Map<String, List<Map<String, dynamic>>> grouped = {};
 
-        for (var doc in chats) {
+        for (var doc in docs) {
           final data = doc.data() as Map<String, dynamic>;
-          grouped.putIfAbsent(data['listingId'], () => []);
-          grouped[data['listingId']]!.add(data);
+          final id = data['listingId'];
+
+          if (id == null) continue;
+
+          grouped.putIfAbsent(id, () => []);
+          grouped[id]!.add(data);
         }
 
         final products = grouped.values.toList();
 
+        /// 🧾 LIST
         return ListView.builder(
           padding: const EdgeInsets.all(14),
           itemCount: products.length,
           itemBuilder: (context, index) {
             final item = products[index].first;
-            final chatCount = products[index].length;
+            final count = products[index].length;
 
             return InkWell(
               borderRadius: BorderRadius.circular(20),
@@ -106,7 +120,7 @@ class BuyingProductsView extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    /// IMAGE
+                    /// 🖼 IMAGE
                     ClipRRect(
                       borderRadius: BorderRadius.circular(14),
                       child: Image.network(
@@ -125,12 +139,11 @@ class BuyingProductsView extends StatelessWidget {
 
                     const SizedBox(width: 12),
 
-                    /// DETAILS
+                    /// 📄 DETAILS
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          /// TITLE
                           Text(
                             item['listingTitle'] ?? "",
                             maxLines: 2,
@@ -142,18 +155,16 @@ class BuyingProductsView extends StatelessWidget {
 
                           const SizedBox(height: 6),
 
-                          /// PRICE
                           Text(
                             "₹ ${item['price'] ?? "0"}",
                             style: theme.textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: theme.colorScheme.primary, // ✅ dynamic
+                              color: theme.colorScheme.primary,
                             ),
                           ),
 
                           const SizedBox(height: 6),
 
-                          /// CHAT COUNT
                           Row(
                             children: [
                               Icon(
@@ -163,7 +174,7 @@ class BuyingProductsView extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                "$chatCount Leads",
+                                "$count Leads",
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: theme.hintColor,
                                 ),
@@ -174,7 +185,6 @@ class BuyingProductsView extends StatelessWidget {
                       ),
                     ),
 
-                    /// ➡️ TRAILING ICON
                     Icon(
                       Icons.arrow_forward_ios_rounded,
                       size: 16,
@@ -215,34 +225,45 @@ class SellingProductsView extends StatelessWidget {
     return StreamBuilder<QuerySnapshot>(
       stream: controller.getSellingProducts(),
       builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return _stateView(
-            icon: Icons.error_outline,
-            title: "Something went wrong",
-            subtitle: "Please try again later",
-          );
-        }
-
-        if (!snapshot.hasData) {
+        /// 🔄 LOADING
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        final chats = snapshot.data!.docs;
-
-        if (chats.isEmpty) {
-          return _stateView(
-            icon: Icons.inventory_2_outlined,
-            title: "No buyers yet",
-            subtitle: "Buyers will appear here",
+        ///  ERROR
+        if (snapshot.hasError) {
+          return _stateWidget(
+            icon: Icons.error_outline,
+            text: "Something went wrong",
           );
         }
 
-        /// GROUP
-        Map<String, List<Map<String, dynamic>>> grouped = {};
-        for (var doc in chats) {
+        /// 🔥 IGNORE CACHE
+        // if (snapshot.hasData && snapshot.data!.metadata.isFromCache) {
+        //   return const Center(child: CircularProgressIndicator());
+        // }
+
+        final docs = snapshot.data?.docs ?? [];
+
+        /// 😔 EMPTY
+        if (docs.isEmpty) {
+          return _stateWidget(
+            icon: Icons.inventory_2_outlined,
+            text: "No buyers yet",
+          );
+        }
+
+        /// 🔁 GROUP
+        final Map<String, List<Map<String, dynamic>>> grouped = {};
+
+        for (var doc in docs) {
           final data = doc.data() as Map<String, dynamic>;
-          grouped.putIfAbsent(data['listingId'], () => []);
-          grouped[data['listingId']]!.add(data);
+          final id = data['listingId'];
+
+          if (id == null) continue;
+
+          grouped.putIfAbsent(id, () => []);
+          grouped[id]!.add(data);
         }
 
         final products = grouped.values.toList();
@@ -252,7 +273,7 @@ class SellingProductsView extends StatelessWidget {
           itemCount: products.length,
           itemBuilder: (context, index) {
             final item = products[index].first;
-            final buyersCount = products[index].length;
+            final count = products[index].length;
 
             return InkWell(
               borderRadius: BorderRadius.circular(20),
@@ -300,7 +321,6 @@ class SellingProductsView extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          /// TITLE
                           Text(
                             item['listingTitle'] ?? "",
                             maxLines: 2,
@@ -312,18 +332,16 @@ class SellingProductsView extends StatelessWidget {
 
                           const SizedBox(height: 6),
 
-                          /// PRICE
                           Text(
                             "₹ ${item['price'] ?? "0"}",
                             style: theme.textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: theme.primaryColor,
+                              color: theme.colorScheme.primary,
                             ),
                           ),
 
                           const SizedBox(height: 6),
 
-                          /// BUYERS COUNT
                           Row(
                             children: [
                               Icon(
@@ -333,7 +351,7 @@ class SellingProductsView extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                "$buyersCount interested",
+                                "$count interested",
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: theme.hintColor,
                                 ),
@@ -344,7 +362,6 @@ class SellingProductsView extends StatelessWidget {
                       ),
                     ),
 
-                    /// ➡️ TRAILING ICON
                     Icon(
                       Icons.arrow_forward_ios_rounded,
                       size: 16,
@@ -360,31 +377,15 @@ class SellingProductsView extends StatelessWidget {
     );
   }
 
-  Widget _stateView({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-  }) {
+  Widget _stateWidget({required IconData icon, required String text}) {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 60, color: Colors.grey),
-            const SizedBox(height: 16),
-            Text(
-              title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              subtitle,
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.grey),
-            ),
-          ],
-        ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 60, color: Colors.grey),
+          const SizedBox(height: 12),
+          Text(text, style: const TextStyle(color: Colors.grey)),
+        ],
       ),
     );
   }

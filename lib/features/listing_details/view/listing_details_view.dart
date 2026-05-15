@@ -8,6 +8,7 @@ import 'package:kitab_mandi/features/listing_details/controller/listing_details_
 import 'package:kitab_mandi/routes/app_routes.dart';
 import 'package:kitab_mandi/widgets/app_button.dart';
 import 'package:kitab_mandi/widgets/app_cached_image_network.dart';
+import 'package:kitab_mandi/widgets/app_image_view.dart';
 import 'package:kitab_mandi/widgets/app_text.dart';
 
 class ListingDetailsView extends StatefulWidget {
@@ -79,10 +80,20 @@ class _ListingDetailsViewState extends State<ListingDetailsView> {
                   onPageChanged: (index, _) => controller.changeIndex(index),
                 ),
                 items: images.map((img) {
-                  return AppCachedImageNetwork(
-                    width: MediaQuery.of(context).size.width,
-                    fit: BoxFit.cover,
-                    imageUrl: img,
+                  return GestureDetector(
+                    onTap: () {
+                      Get.to(
+                        () => FullScreenImageView(
+                          images: images,
+                          initialIndex: images.indexOf(img),
+                        ),
+                      );
+                    },
+                    child: AppCachedImageNetwork(
+                      width: MediaQuery.of(context).size.width,
+                      fit: BoxFit.cover,
+                      imageUrl: img,
+                    ),
                   );
                 }).toList(),
               ),
@@ -273,7 +284,7 @@ class _ListingDetailsViewState extends State<ListingDetailsView> {
             final currentUid = controller.currentUser?.uid;
             final sellerUid = widget.listing.seller['uid'];
 
-            /// ✅ CHECK OWNER
+            ///  CHECK OWNER
             final isOwner = currentUid == sellerUid;
 
             if (isOwner) {
@@ -348,29 +359,32 @@ class _ListingDetailsViewState extends State<ListingDetailsView> {
     );
   }
 
-  // 🔥 ROW FIXED RESPONSIVE
+  //  ROW FIXED RESPONSIVE
   Widget _row(BuildContext context, String title, dynamic value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 4,
-            child: AppText(
-              title,
-              style: TextStyle(color: Colors.grey.shade500),
+    return Visibility(
+      visible: value.toString().isNotEmpty ? true : false,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          children: [
+            Expanded(
+              flex: 4,
+              child: AppText(
+                title,
+                style: TextStyle(color: Colors.grey.shade500),
+              ),
             ),
-          ),
-          Expanded(
-            flex: 6,
-            child: AppText(
-              value?.toString() ?? "",
-              align: TextAlign.end,
+            Expanded(
+              flex: 6,
+              child: AppText(
+                value?.toString() ?? "",
+                align: TextAlign.end,
 
-              maxLines: 1,
+                maxLines: 1,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

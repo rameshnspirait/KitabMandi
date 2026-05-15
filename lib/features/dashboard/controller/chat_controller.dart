@@ -19,6 +19,18 @@ class ChatController extends GetxController {
 
     final chatRef = _firestore.collection('chats').doc(chatId);
 
+    /// ✅ NAVIGATE INSTANTLY (NO WAIT)
+    Get.toNamed(
+      AppRoutes.chatRoom,
+      arguments: {
+        "chatId": chatId,
+        "listingTitle": listing,
+        "listingImage": listing.images.first,
+        "userName": listing.seller['name'],
+      },
+    );
+
+    /// 🔥 BACKGROUND WORK
     final chatDoc = await chatRef.get();
 
     if (!chatDoc.exists) {
@@ -30,7 +42,6 @@ class ChatController extends GetxController {
         "listingImage": listing.images.isNotEmpty ? listing.images.first : "",
         "buyerId": buyerId,
         "sellerId": sellerId,
-        "isSeen": false,
         "participants": [buyerId, sellerId],
         "lastMessage": "Hello, is this available ??",
         "lastMessageTime": FieldValue.serverTimestamp(),
@@ -43,17 +54,6 @@ class ChatController extends GetxController {
         "timestamp": FieldValue.serverTimestamp(),
       });
     }
-
-    /// 👉 OPEN CHAT DIRECTLY
-    Get.toNamed(
-      AppRoutes.chatRoom,
-      arguments: {
-        "chatId": chatId,
-        "listingTitle": listing,
-        "listingImage": listing.images.first,
-        "userName": listing.seller['name'],
-      },
-    );
   }
 
   Future<void> markMessagesAsSeen(String chatId, String myId) async {

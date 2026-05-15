@@ -4,12 +4,36 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kitab_mandi/core/constants/app_color.dart';
 
-class ChatRoomView extends StatelessWidget {
+class ChatRoomView extends StatefulWidget {
+  const ChatRoomView({super.key});
+
+  @override
+  State<ChatRoomView> createState() => _ChatRoomViewState();
+}
+
+class _ChatRoomViewState extends State<ChatRoomView> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final currentUser = FirebaseAuth.instance.currentUser;
+
   final args = Get.arguments;
-  ChatRoomView({super.key});
   final TextEditingController messageController = TextEditingController();
+
+  bool _isMarking = false;
+  bool _isInitialLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    /// ⏱ Controlled loader (prevents flicker)
+    Future.delayed(const Duration(milliseconds: 400), () {
+      if (mounted) {
+        setState(() {
+          _isInitialLoading = false;
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +58,6 @@ class ChatRoomView extends StatelessWidget {
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
       ),
-
       body: Column(
         children: [
           /// ================= MESSAGE LIST =================
@@ -45,56 +68,78 @@ class ChatRoomView extends StatelessWidget {
                   .doc(chatId)
                   .collection('messages')
                   .orderBy('timestamp', descending: true)
-                  .snapshots(),
+                  .snapshots(includeMetadataChanges: true),
               builder: (context, snapshot) {
+                /// ❌ ERROR
+                if (snapshot.hasError) {
+                  return const Center(child: Text("Something went wrong"));
+                }
+
+                /// ⏳ INITIAL LOADER (ONLY SHORT TIME)
+                if (_isInitialLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                /// ⏳ NO DATA
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                final messages = snapshot.data!.docs;
+                final docs = snapshot.data!.docs;
 
-                ///  MARK MESSAGES AS SEEN
-                _markMessagesAsSeen(messages, chatId);
+                /// 🧹 FILTER VALID MESSAGES
+                final messages = docs.where((doc) {
+                  final data = doc.data() as Map<String, dynamic>;
+                  return data['timestamp'] != null;
+                }).toList();
 
+                /// EMPTY STATE
                 if (messages.isEmpty) {
-                  return const Center(child: Text("No messages yet"));
+                  return const Center(child: Text("Start conversation 👋"));
                 }
+
+                /// MARK AS SEEN
+                Future.microtask(() {
+                  _markMessagesAsSeen(messages, chatId);
+                });
 
                 final grouped = _groupMessagesByDate(messages);
 
-                return ListView.builder(
-                  reverse: true,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
+                return AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: ListView.builder(
+                    key: ValueKey(messages.length),
+                    reverse: true,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    itemCount: grouped.length,
+                    itemBuilder: (context, index) {
+                      final entry = grouped[index];
+                      final dateLabel = entry['date'];
+                      final msgs = entry['messages'];
+
+                      return Column(
+                        children: [
+                          _dateHeader(dateLabel, isDark),
+                          ...msgs.map((msg) {
+                            final data = msg.data() as Map<String, dynamic>;
+                            final isMe = data['senderId'] == currentUser!.uid;
+
+                            return _messageBubble(
+                              msg: data,
+                              isMe: isMe,
+                              messageId: msg.id,
+                              chatId: chatId,
+                              otherColor: otherMsgColor,
+                              theme: theme,
+                            );
+                          }).toList(),
+                        ],
+                      );
+                    },
                   ),
-                  itemCount: grouped.length,
-                  itemBuilder: (context, index) {
-                    final entry = grouped[index];
-                    final dateLabel = entry['date'];
-                    final msgs = entry['messages'];
-
-                    return Column(
-                      children: [
-                        _dateHeader(dateLabel, isDark),
-
-                        ...msgs.map((msg) {
-                          final data = msg.data() as Map<String, dynamic>;
-
-                          final isMe = data['senderId'] == currentUser!.uid;
-
-                          return _messageBubble(
-                            msg: data,
-                            isMe: isMe,
-                            messageId: msg.id,
-                            chatId: chatId,
-                            otherColor: otherMsgColor,
-                            theme: theme,
-                          );
-                        }).toList(),
-                      ],
-                    );
-                  },
                 );
               },
             ),
@@ -133,9 +178,7 @@ class ChatRoomView extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   const SizedBox(width: 8),
-
                   GestureDetector(
                     onTap: () async {
                       if (messageController.text.trim().isEmpty) return;
@@ -150,7 +193,7 @@ class ChatRoomView extends StatelessWidget {
                             "senderId": currentUser!.uid,
                             "message": text,
                             "timestamp": FieldValue.serverTimestamp(),
-                            "isSeen": false, // ✅ IMPORTANT
+                            "isSeen": false,
                           });
 
                       await _firestore.collection('chats').doc(chatId).update({
@@ -182,16 +225,20 @@ class ChatRoomView extends StatelessWidget {
     );
   }
 
-  // ================= MARK AS SEEN =================
+  /// ================= MARK AS SEEN =================
   void _markMessagesAsSeen(
     List<QueryDocumentSnapshot> messages,
     String chatId,
-  ) {
+  ) async {
+    if (_isMarking) return;
+
+    _isMarking = true;
+
     for (var msg in messages) {
       final data = msg.data() as Map<String, dynamic>;
 
       if (data['senderId'] != currentUser!.uid && data['isSeen'] == false) {
-        _firestore
+        await _firestore
             .collection('chats')
             .doc(chatId)
             .collection('messages')
@@ -199,17 +246,17 @@ class ChatRoomView extends StatelessWidget {
             .update({"isSeen": true});
       }
     }
+
+    _isMarking = false;
   }
 
-  // ================= GROUP BY DATE =================
+  /// ================= GROUP BY DATE =================
   List<Map<String, dynamic>> _groupMessagesByDate(
     List<QueryDocumentSnapshot> messages,
   ) {
-    /// ✅ STEP 1: Sort messages by timestamp (OLD → NEW)
     messages.sort((a, b) {
       final aTime = (a['timestamp'] as Timestamp?)?.toDate();
       final bTime = (b['timestamp'] as Timestamp?)?.toDate();
-
       if (aTime == null || bTime == null) return 0;
       return aTime.compareTo(bTime);
     });
@@ -217,11 +264,8 @@ class ChatRoomView extends StatelessWidget {
     final Map<String, List<QueryDocumentSnapshot>> grouped = {};
     final List<String> order = [];
 
-    /// ✅ STEP 2: Group messages
     for (var msg in messages) {
-      final data = msg.data() as Map<String, dynamic>;
-      final ts = data['timestamp'];
-
+      final ts = msg['timestamp'];
       if (ts == null) continue;
 
       final date = ts.toDate();
@@ -229,17 +273,15 @@ class ChatRoomView extends StatelessWidget {
 
       if (!grouped.containsKey(key)) {
         grouped[key] = [];
-        order.add(key); //  preserve order
+        order.add(key);
       }
 
       grouped[key]!.add(msg);
     }
 
-    ///  STEP 3: Return in correct order
     return order.map((key) => {"date": key, "messages": grouped[key]}).toList();
   }
 
-  // ================= DATE LABEL =================
   String _getDateLabel(DateTime date) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -248,10 +290,7 @@ class ChatRoomView extends StatelessWidget {
 
     if (diff == 0) return "Today";
     if (diff == 1) return "Yesterday";
-
-    if (diff <= 7) {
-      return _weekdayName(date.weekday);
-    }
+    if (diff <= 7) return _weekdayName(date.weekday);
 
     return "${date.day}/${date.month}/${date.year}";
   }
@@ -269,7 +308,6 @@ class ChatRoomView extends StatelessWidget {
     return days[day - 1];
   }
 
-  // ================= DATE HEADER =================
   Widget _dateHeader(String text, bool isDark) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -292,7 +330,6 @@ class ChatRoomView extends StatelessWidget {
     );
   }
 
-  // ================= TICK =================
   Widget buildTick(bool isMe, bool isSeen) {
     if (!isMe) return const SizedBox();
 
@@ -303,7 +340,6 @@ class ChatRoomView extends StatelessWidget {
     );
   }
 
-  // ================= MESSAGE BUBBLE =================
   Widget _messageBubble({
     required Map<String, dynamic> msg,
     required bool isMe,
@@ -364,10 +400,9 @@ class ChatRoomView extends StatelessWidget {
     );
   }
 
-  // ================= TIME FORMAT =================
   String _formatTime(dynamic timestamp) {
     if (timestamp == null) return "";
     final DateTime date = timestamp.toDate();
-    return TimeOfDay.fromDateTime(date).format(Get.context!);
+    return TimeOfDay.fromDateTime(date).format(context);
   }
 }
