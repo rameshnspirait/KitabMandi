@@ -8,9 +8,7 @@ class ChatRoomView extends StatelessWidget {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final currentUser = FirebaseAuth.instance.currentUser;
   final args = Get.arguments;
-
   ChatRoomView({super.key});
-
   final TextEditingController messageController = TextEditingController();
 
   @override
@@ -55,7 +53,7 @@ class ChatRoomView extends StatelessWidget {
 
                 final messages = snapshot.data!.docs;
 
-                /// ✅ MARK MESSAGES AS SEEN
+                ///  MARK MESSAGES AS SEEN
                 _markMessagesAsSeen(messages, chatId);
 
                 if (messages.isEmpty) {

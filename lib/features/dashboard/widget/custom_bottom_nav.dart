@@ -126,7 +126,7 @@ class _CustomBottomNavState extends State<CustomBottomNav>
                     boxShadow: [
                       BoxShadow(
                         color: theme.colorScheme.primary.withOpacity(0.35),
-                        blurRadius: 5,
+                        blurRadius: 2,
                       ),
                     ],
                   ),
