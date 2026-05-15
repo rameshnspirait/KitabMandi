@@ -44,7 +44,7 @@ class HomeController extends GetxController {
     /// 🔍 SEARCH FILTER
     if (searchQuery.value.isNotEmpty) {
       temp = temp.where((item) {
-        final title = item.title?.toLowerCase() ?? "";
+        final title = item.title.toLowerCase();
         return title.contains(searchQuery.value.toLowerCase());
       }).toList();
     }

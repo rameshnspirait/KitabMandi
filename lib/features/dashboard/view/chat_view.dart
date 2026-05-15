@@ -144,10 +144,10 @@ class BuyingProductsView extends StatelessWidget {
 
                           /// PRICE
                           Text(
-                            "₹${item['price'] ?? "0"}",
+                            "₹ ${item['price'] ?? "0"}",
                             style: theme.textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: theme.primaryColor,
+                              color: theme.colorScheme.primary, // ✅ dynamic
                             ),
                           ),
 
