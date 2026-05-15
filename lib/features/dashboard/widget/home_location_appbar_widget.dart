@@ -79,12 +79,12 @@ class LocationAppBar extends StatelessWidget implements PreferredSizeWidget {
         ],
       ),
 
-      actions: [
-        IconButton(
-          onPressed: () {},
-          icon: Icon(Icons.notifications_none, color: theme.iconTheme.color),
-        ),
-      ],
+      // actions: [
+      //   IconButton(
+      //     onPressed: () {},
+      //     icon: Icon(Icons.notifications_none, color: theme.iconTheme.color),
+      //   ),
+      // ],
 
       // 🔥 THIS IS THE IMPORTANT PART (SEARCH BAR)
       bottom: PreferredSize(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
+import 'package:kitab_mandi/core/controller/filter_controller.dart';
 import 'package:kitab_mandi/features/dashboard/controller/home_controller.dart';
 import 'package:kitab_mandi/features/dashboard/widget/home_listing_card_shimmer.dart';
 import 'package:kitab_mandi/features/dashboard/widget/home_listing_card_widget.dart';
@@ -10,6 +11,7 @@ class HomeView extends StatelessWidget {
   HomeView({super.key});
 
   final homeCtrl = Get.put(HomeController());
+  final filterCtrl = Get.put(FilterController());
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +23,8 @@ class HomeView extends StatelessWidget {
 
       body: RefreshIndicator(
         onRefresh: () async {
-          await homeCtrl.fetchListings();
+          filterCtrl.reset();
+          homeCtrl.listenListings();
         },
 
         //  MAIN FIX → OBX

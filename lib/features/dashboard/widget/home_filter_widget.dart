@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kitab_mandi/core/controller/filter_controller.dart';
+import 'package:kitab_mandi/features/dashboard/controller/home_controller.dart';
 
 class FilterScreen extends StatelessWidget {
   FilterScreen({super.key});
@@ -140,7 +141,7 @@ class FilterScreen extends StatelessWidget {
             ),
           ),
 
-          /// 🔥 APPLY BUTTON
+          ///  APPLY BUTTON
           Padding(
             padding: const EdgeInsets.all(16),
             child: ElevatedButton(
@@ -148,6 +149,8 @@ class FilterScreen extends StatelessWidget {
                 minimumSize: const Size(double.infinity, 50),
               ),
               onPressed: () {
+                final homeCtrl = Get.put(HomeController());
+                homeCtrl.applyFilters();
                 Get.back(result: controller);
               },
               child: const Text("Apply Filters"),
